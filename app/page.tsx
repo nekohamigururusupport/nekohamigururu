@@ -6,19 +6,15 @@ import { FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 
 // 🐾 オープニング用：ネオンガラス肉球の花火エフェクトパーツ
-// 色感をTOPのネオンピンクに合わせるため、borderとbgの色を調整
 const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left: string, rotate: string, delay: number, scale: string }) => (
   <motion.div
     className={`absolute w-32 h-32 md:w-48 md:h-48 ${scale}`}
     style={{ top, left, rotate }}
     initial={{ opacity: 0, scale: 0 }}
-    // ポンッと出てフワッと消えるアニメーション
     animate={{ opacity: [0, 0.8, 0], scale: [0.5, 1.2, 1.5] }}
     transition={{ delay, duration: 1.5, ease: "easeOut" }}
   >
-    {/* シャドウもピンクに寄せる */}
     <div className="relative w-full h-full drop-shadow-[0_0_20px_rgba(244,114,182,0.8)]">
-      {/* 👇 borderとbgを、TOPのネオンピンク(red-400系)に合わせる */}
       <div className="absolute top-[10%] left-[15%] w-[20%] h-[25%] bg-red-500/30 backdrop-blur-md border border-red-400/80 rounded-[50%_50%_40%_40%] -rotate-[25deg]"></div>
       <div className="absolute top-[0%] left-[40%] w-[20%] h-[25%] bg-red-500/30 backdrop-blur-md border border-red-400/80 rounded-[50%_50%_40%_40%]"></div>
       <div className="absolute top-[10%] right-[15%] w-[20%] h-[25%] bg-red-500/30 backdrop-blur-md border border-red-400/80 rounded-[50%_50%_40%_40%] rotate-[25deg]"></div>
@@ -30,17 +26,14 @@ const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left:
 // 🐾 オープニング画面コンポーネント
 const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
   useEffect(() => {
-    // 少し長めの約4秒後に本編へ
     const timer = setTimeout(() => {
       onComplete();
     }, 4000);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
-  // テキストは「猫喰ぐるる」のまま
   const chars = ["猫", "喰", "ぐ", "る", "る"];
 
-  // 花火みたいに出る肉球の配置とタイミング
   const paws = [
     { top: '20%', left: '20%', rotate: '-15deg', delay: 0.3, scale: 'scale-75' },
     { top: '60%', left: '70%', rotate: '30deg', delay: 0.8, scale: 'scale-110' },
@@ -52,30 +45,24 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
   return (
     <motion.div
       className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex items-center justify-center overflow-hidden"
-      // 終わる時にフワッとぼやけながら消える
       exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
     >
-      {/* 背景のネオン肉球花火 */}
       {paws.map((p, i) => (
         <SplashNeonPaw key={i} top={p.top} left={p.left} rotate={p.rotate} delay={p.delay} scale={p.scale} />
       ))}
 
-      {/* 👇 1文字ずつ出てくる名前。 */}
       <div className="flex gap-1 md:gap-2 relative z-10">
         {chars.map((char, i) => (
           <motion.span
             key={i}
-            // 👇 ここを修正。インデックス(i)に応じてクラス名を切り替える
             className={`text-5xl md:text-7xl lg:text-8xl font-black ${
               i < 2 
-                ? 'text-[#f4ebeb] drop-shadow-md' // 猫喰：TOPと同じ白＋薄いシャドウ
-                : 'text-red-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.8)]' // ぐるる：ネオンピンク＋強いシャドウ
+                ? 'text-[#f4ebeb] drop-shadow-md' 
+                : 'text-red-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.8)]' 
             }`}
-            // 左からスライドしつつぼかしが取れる
             initial={{ opacity: 0, x: -50, filter: "blur(10px)" }}
             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-            // i * 0.12 で1文字ずつ順番に出るように計算。少し早めにしてテンポよく
             transition={{ delay: 0.5 + i * 0.12, duration: 0.6, type: "spring", stiffness: 100 }}
           >
             {char}
@@ -109,6 +96,7 @@ const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotat
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const snsLinks = [
     { n: 'X (Twitter)', icon: <FaXTwitter className="text-lg" />, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
@@ -125,24 +113,23 @@ export default function Home() {
         {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       </AnimatePresence>
 
-      {/* スプラッシュ中はスクロールできないように overflow-hidden をつける */}
       <main className={`min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 relative ${showSplash ? 'h-screen overflow-hidden' : 'overflow-x-hidden'}`}>
         <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-50"></div>
 
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden text-black select-none">
           <GlassPawBG className="w-48 h-48 top-[5%] left-[5%] rotate-12" />
-          <GlassPawBG className="w-96 h-96 top-[60%] right-[-10%] -rotate-45 opacity-20" />
+          <GlassPawBG className="hidden md:block w-96 h-96 top-[60%] right-[-10%] -rotate-45 opacity-20" />
           <GlassPawBG className="w-32 h-32 top-[35%] right-[15%] rotate-[70deg]" />
-          <GlassPawBG className="w-64 h-64 top-[80%] left-[10%] rotate-[-20deg]" />
+          <GlassPawBG className="hidden md:block w-64 h-64 top-[80%] left-[10%] rotate-[-20deg]" />
           <GlassPawBG className="w-40 h-40 top-[20%] left-[45%] rotate-[180deg]" />
-          <GlassPawBG className="w-24 h-24 top-[50%] left-[5%] rotate-45 opacity-25" />
+          <GlassPawBG className="hidden md:block w-24 h-24 top-[50%] left-[5%] rotate-45 opacity-25" />
           <GlassPawBG className="w-80 h-80 top-[10%] left-[80%] -rotate-[30deg] opacity-15" />
-          <GlassPawBG className="w-56 h-56 top-[60%] left-[60%] rotate-[120deg]" />
+          <GlassPawBG className="hidden md:block w-56 h-56 top-[60%] left-[60%] rotate-[120deg]" />
           <GlassPawBG className="w-32 h-32 top-[70%] left-[25%] rotate-[15deg] opacity-35" />
-          <GlassPawBG className="w-44 h-44 bottom-[5%] right-[30%] -rotate-[100deg]" />
+          <GlassPawBG className="hidden md:block w-44 h-44 bottom-[5%] right-[30%] -rotate-[100deg]" />
           
           <span className="absolute top-[25%] right-[5%] text-6xl opacity-[0.02] -rotate-12">🦴</span>
-          <span className="absolute top-[75%] left-[40%] text-5xl opacity-[0.03] rotate-45">🦴</span>
+          <span className="hidden md:block absolute top-[75%] left-[40%] text-5xl opacity-[0.03] rotate-45">🦴</span>
         </div>
 
         <div className="w-full min-h-screen relative z-10">
@@ -150,33 +137,67 @@ export default function Home() {
           <header className="fixed top-0 w-full h-16 bg-[#453e40]/90 backdrop-blur-sm border-b border-white/10 z-[60] flex items-center justify-between px-6 md:px-16 shadow-sm">
             <div className="flex items-center gap-2">
               <span className="text-2xl opacity-80">🐾</span>
-              {/* 👇 ここを修正。全体の色を白(#f4ebeb)に、ドロップシャドウを消す */}
               <div className="text-[#f4ebeb] font-bold text-base tracking-[0.1em] cursor-default">
-                猫喰{/* 👇 「ぐるる」だけspanで囲ってピンクとシャドウを適用 */}
-                <span className="text-red-300 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
+                猫喰<span className="text-red-300 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
               </div>
             </div>
+
             <nav className="hidden md:flex gap-10 text-[20px] tracking-wide text-[#d1c5c7] font-bold">
               {['TOP', 'PROFILE', 'TAGS', 'MESSAGE', 'MUSIC', 'SCHEDULE'].map((item) => (
                 <a key={item} href={`#${item.toLowerCase()}`} className="hover:text-red-300 transition-all uppercase">{item}</a>
               ))}
             </nav>
+
+            <button 
+              className="md:hidden text-[#f4ebeb] p-2 focus:outline-none"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </header>
 
-          <section id="top" className="min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-16 lg:mb-32 relative scroll-mt-24">
-            <div className="flex-1 text-center md:text-left z-10 order-2 md:order-1 lg:pl-10">
-              {/* 👇 テキストを前回の要望通り日本語に変更 */}
-              <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[20px] tracking-widest mb-6 bg-red-900/10">
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="fixed top-16 left-0 w-full bg-[#3a3335]/95 backdrop-blur-md border-b border-white/10 flex flex-col items-center py-4 gap-3 md:hidden z-[55] shadow-xl"
+              >
+                {['TOP', 'PROFILE', 'TAGS', 'MESSAGE', 'MUSIC', 'SCHEDULE'].map((item) => (
+                  <a 
+                    key={item} 
+                    href={`#${item.toLowerCase()}`}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-[#f4ebeb] font-bold text-[11px] tracking-[0.2em] hover:text-red-300 transition-colors uppercase"
+                  >
+                    {item}
+                  </a>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-16 lg:mb-32 relative scroll-mt-24 gap-12 md:gap-0 -translate-y-10 md:translate-y-0">
+            
+            <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-10 flex flex-col items-center md:items-start">
+              <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
                 新人Vtuber
               </div>
-              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight drop-shadow-md">
+              <h1 className="text-[38px] md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight drop-shadow-md">
                 猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
               </h1>
-              <p className="text-[#c2b6b8] text-xs lg:text-sm tracking-[1em] mt-2 font-bold uppercase">Nekohami Gururu</p>
+              <p className="text-[#c2b6b8] text-[10px] md:text-xs lg:text-sm tracking-[1em] mt-2 font-bold uppercase">Nekohami Gururu</p>
             </div>
 
-            <div className="flex-1 w-full flex items-center justify-center order-1 md:order-2 mb-12 md:mb-0 relative">
-              <div className="w-64 h-64 md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] bg-[#544b4d] border border-white/10 rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group z-10 transition-all">
+            <div className="flex-none md:flex-1 w-full flex items-center justify-center relative z-10">
+              <div className="w-64 h-64 md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] bg-[#544b4d] border border-white/10 rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group transition-all">
                 <span className="text-white/10 text-9xl absolute -bottom-8 -right-8 rotate-12 group-hover:rotate-0 transition-transform duration-700 drop-shadow-lg">🦴</span>
                 <p className="text-[#a89c9e] text-xs italic tracking-widest">CHARACTER VIEW</p>
               </div>
@@ -208,9 +229,9 @@ export default function Home() {
           )}
 
           <section className="py-16 lg:py-24 px-6 relative">
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8 z-10 relative">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto z-10 relative">
               {snsLinks.map((sns) => (
-                <div key={sns.n} className={`px-6 py-3 border ${sns.c} rounded-2xl text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center gap-3`}>
+                <div key={sns.n} className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}>
                   {sns.icon}
                   <span className="mt-[2px]">{sns.n}</span>
                 </div>
@@ -218,15 +239,24 @@ export default function Home() {
             </div>
           </section>
 
+          {/* 👇 PROFILEセクション：全体をコンパクトにし、スマホではテキストを両端いっぱいに */}
           <section id="profile" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-7xl mx-auto scroll-mt-24">
-            <div className="bg-[#544b4d] rounded-[4rem] p-10 md:p-16 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[80vh] flex flex-col justify-center">
+            {/* 👇 min-h-[70vh] で高さをコンパクトにし、スマホの上下余白を py-8 に短縮 */}
+            <div className="bg-[#544b4d] rounded-[2.5rem] md:rounded-[4rem] px-8 pt-10 pb-10 md:p-16 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center">
               <div className="absolute top-10 right-10 text-9xl opacity-[0.01] rotate-12">🐾</div>
-              <h2 className="text-3xl lg:text-4xl font-black text-red-300 mb-16 flex items-center gap-4 tracking-widest drop-shadow-sm">
+              
+              {/* 👇 mb-6 にしてタイトルとテキストの隙間を詰める */}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-red-300 mb-10 md:mb-16 flex items-center gap-4 tracking-widest drop-shadow-sm">
                 <span className="text-red-400 opacity-50">🐾</span> 噛み跡紹介
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-10 items-center">
-                <div className="space-y-8 text-[#d1c5c7] text-lg lg:text-xl leading-loose font-bold tracking-wide">
+              
+              {/* 👇 gap-6 にして上下要素の隙間を詰める */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 lg:gap-10 items-center w-full">
+                
+                {/* 👇 テキストを両端いっぱい (w-full) かつ 左寄せ (text-left) に固定 */}
+                <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16x] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
                   <p>
+                    {/* 👇 余計なクラスを消して、ただの <br /> に戻したよ！ */}
                     猫喰ぐるる（Nekohami Gururu）<br />
                     ポップな可愛さの裏に魚の骨のような<br />
                     鋭いこだわりを隠し持つ<br />
@@ -238,15 +268,16 @@ export default function Home() {
                     空間を作っていくよ！
                   </p>
                 </div>
-                <div className="bg-[#453e40] p-10 lg:p-12 rounded-[2.5rem] border border-white/5 space-y-8 shadow-inner">
-                  <div className="flex justify-between border-b border-white/5 pb-4">
-                    <span className="text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-lg lg:text-xl font-bold text-[#f4ebeb]">7月18日</span>
+
+                <div className="bg-[#453e40] p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-white/5 space-y-4 md:space-y-8 shadow-inner w-full">
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4">
+                    <span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">7月18日</span>
                   </div>
-                  <div className="flex justify-between border-b border-white/5 pb-4">
-                    <span className="text-base lg:text-lg text-[#a89c9e] font-medium">好きなもの</span><span className="text-lg lg:text-xl font-bold text-[#f4ebeb]">ゲーム、お歌、魚</span>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4">
+                    <span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">好きなもの</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">ゲーム</span>
                   </div>
-                  <div className="flex justify-between pb-2">
-                    <span className="text-base lg:text-lg text-[#a89c9e] font-medium">ファンマーク</span><span className="text-xl lg:text-2xl text-[#f4ebeb]">🐾🦴</span>
+                  <div className="flex justify-between pb-1 md:pb-2">
+                    <span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">ファンマーク</span><span className="text-lg md:text-xl lg:text-2xl text-[#f4ebeb]">🐾🦴</span>
                   </div>
                 </div>
               </div>
@@ -308,9 +339,9 @@ export default function Home() {
           </section>
 
           <section className="py-12 lg:py-24 px-6 border-b border-white/5 mb-32 lg:mb-64">
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto">
               {snsLinks.map((sns) => (
-                <div key={`dup-${sns.n}`} className={`px-6 py-3 border ${sns.c} rounded-2xl text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center gap-3`}>
+                <div key={`dup-${sns.n}`} className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}>
                   {sns.icon}
                   <span className="mt-[2px]">{sns.n}</span>
                 </div>
@@ -375,9 +406,9 @@ export default function Home() {
           </section>
 
           <footer className="py-20 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-16">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto mb-16">
               {snsLinks.map((sns) => (
-                <div key={`footer-${sns.n}`} className={`px-6 py-3 border ${sns.c} rounded-2xl text-[11px] font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center gap-2`}>
+                <div key={`footer-${sns.n}`} className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-[11px] font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2`}>
                   {sns.icon}
                   <span className="mt-[2px]">{sns.n}</span>
                 </div>
@@ -388,7 +419,6 @@ export default function Home() {
               <span className="text-red-400 text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md">猫喰ぐるる</span>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
-                {/* 👇 フッターのテキストを前回の要望通り日本語に変更。クォーテーションマークも含める */}
                 サイト制作🐾: <span className="text-white/80">"政獣たちのいるところ：火日"</span>
               </p>
             </div>
