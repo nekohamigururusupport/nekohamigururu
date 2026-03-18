@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaXTwitter, FaYoutube, FaTiktok } from 'react-icons/fa6';
+import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 
 // 🐾 オープニング用：ネオンガラス肉球の花火エフェクトパーツ
@@ -85,7 +85,7 @@ const GlassPawBG = ({ className }: { className: string }) => (
   </div>
 );
 
-// 既存のスケジュールパーツ
+// PC用スケジュールパーツ
 const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotate: string }) => (
   <div className={`relative w-32 h-32 md:w-40 md:h-40 bg-[#544b4d]/80 backdrop-blur-md border border-white/10 rounded-[50%_50%_40%_40%] ${rotate} shadow-lg flex flex-col items-center justify-center p-4 transition-all duration-300 hover:scale-110 hover:-translate-y-4 cursor-pointer group`}>
     <div className="absolute top-[-22%] left-[calc(50%-10px)] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[18px] border-b-red-400 opacity-80 z-[-1] transition-transform duration-300 group-hover:scale-110"></div>
@@ -239,32 +239,26 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 👇 PROFILEセクション：全体をコンパクトにし、スマホではテキストを両端いっぱいに */}
           <section id="profile" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-7xl mx-auto scroll-mt-24">
-            {/* 👇 min-h-[70vh] で高さをコンパクトにし、スマホの上下余白を py-8 に短縮 */}
             <div className="bg-[#544b4d] rounded-[2.5rem] md:rounded-[4rem] px-8 pt-10 pb-10 md:p-16 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center">
               <div className="absolute top-10 right-10 text-9xl opacity-[0.01] rotate-12">🐾</div>
               
-              {/* 👇 mb-6 にしてタイトルとテキストの隙間を詰める */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-red-300 mb-10 md:mb-16 flex items-center gap-4 tracking-widest drop-shadow-sm">
                 <span className="text-red-400 opacity-50">🐾</span> 噛み跡紹介
               </h2>
               
-              {/* 👇 gap-6 にして上下要素の隙間を詰める */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 lg:gap-10 items-center w-full">
                 
-                {/* 👇 テキストを両端いっぱい (w-full) かつ 左寄せ (text-left) に固定 */}
-                <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16x] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
+                <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16px] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
                   <p>
-                    {/* 👇 余計なクラスを消して、ただの <br /> に戻したよ！ */}
-                    猫喰ぐるる（Nekohami Gururu）<br />
-                    ポップな可愛さの裏に魚の骨のような<br />
-                    鋭いこだわりを隠し持つ<br />
+                    猫喰ぐるる（Nekohami Gururu）<br className="hidden md:inline" />
+                    ポップな可愛さの裏に魚の骨のような<br className="hidden md:inline" />
+                    鋭いこだわりを隠し持つ<br className="hidden md:inline" />
                     新人Vチューバー
                   </p>
                   <p>
-                    ゲーム実況や歌ってみたを中心に<br />
-                    リスナーの皆と楽しく<br />
+                    ゲーム実況や歌ってみたを中心に<br className="hidden md:inline" />
+                    リスナーの皆と楽しく<br className="hidden md:inline" />
                     空間を作っていくよ！
                   </p>
                 </div>
@@ -307,18 +301,49 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="message" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-6xl mx-auto scroll-mt-24">
-            <div className="bg-[#544b4d]/60 border border-white/5 rounded-[4rem] p-10 lg:p-20 text-center shadow-2xl relative overflow-hidden min-h-[80vh] flex flex-col justify-center items-center">
-              <div className="absolute -top-10 -right-10 text-9xl opacity-[0.02] -rotate-12">🍬</div>
-              <h2 className="text-3xl lg:text-5xl font-black text-red-300 mb-12 tracking-widest drop-shadow-sm flex items-center gap-3">
-                ぐるるに質問ある？🐾
-              </h2>
-              <p className="text-base lg:text-xl text-[#d1c5c7] mb-16 leading-[2.5] max-w-2xl mx-auto font-bold tracking-wide">
-                配信の感想とか、やってほしいゲームとか、どうでもいい日常の報告とか。気が向いた時に、気まぐれに配信で拾ってあげるかも。……別に、ずっと待ってるわけじゃないけどね.
-              </p>
-              <button className="bg-white hover:bg-red-50 text-red-400 font-black py-6 px-24 rounded-full text-lg lg:text-xl tracking-widest shadow-xl transition-all hover:scale-110 hover:shadow-red-500/30">
+          {/* MESSAGEセクション（ダークレター ＋ 足跡トラッキング ＋ パステルピンクホバー） */}
+          <section id="message" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-6xl mx-auto scroll-mt-24 relative">
+            <div className="bg-[#544b4d]/80 backdrop-blur-md border border-white/5 rounded-2xl md:rounded-[2.5rem] p-8 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden min-h-[60vh] flex flex-col justify-center items-center group z-10">
+              
+              {/* 足跡トラッキング */}
+              <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
+                <FaPaw className="absolute bottom-10 left-[10%] text-6xl text-[#3a3335] -rotate-12" />
+                <FaPaw className="absolute top-[60%] left-[25%] text-6xl text-[#3a3335] rotate-12" />
+                <FaPaw className="absolute top-[35%] left-[45%] text-6xl text-[#3a3335] -rotate-6" />
+                <FaPaw className="absolute top-10 left-[65%] text-6xl text-[#3a3335] rotate-6" />
+                <FaPaw className="absolute top-[-20px] left-[85%] text-6xl text-[#3a3335] rotate-12" />
+              </div>
+
+              {/* ダークレター風フラップ */}
+              <div className="absolute top-0 left-0 w-full h-[120px] md:h-[200px] border-t border-white/5 bg-gradient-to-b from-white/5 to-transparent [clip-path:polygon(0_0,100%_0,50%_100%)] pointer-events-none z-10"></div>
+              <div className="absolute bottom-0 left-0 w-[50%] h-[120px] md:h-[200px] border-l border-white/5 bg-gradient-to-tr from-white/5 to-transparent [clip-path:polygon(0_100%,100%_100%,0_0)] pointer-events-none z-10"></div>
+              <div className="absolute bottom-0 right-0 w-[50%] h-[120px] md:h-[200px] border-r border-white/5 bg-gradient-to-tl from-white/5 to-transparent [clip-path:polygon(100%_100%,0_100%,100%_0)] pointer-events-none z-10"></div>
+
+              {/* タイトル */}
+              <div className="relative mb-8 md:mb-12 z-20 mt-6">
+                <div className="inline-block mb-3 text-red-400/30 text-2xl md:text-3xl"><FaPaw /></div>
+                <h2 className="text-xl md:text-3xl lg:text-4xl font-black text-[#f4ebeb] mb-0 tracking-widest drop-shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
+                  ぐるるに質問ある？
+                </h2>
+              </div>
+
+              {/* 本文 */}
+              <div className="w-full max-w-2xl mx-auto relative z-20 mb-12 md:mb-16">
+                <p className="text-[13px] md:text-base lg:text-lg text-[#d1c5c7] leading-loose md:leading-[2.5] font-medium tracking-wide">
+                  配信の感想とか、やってほしいゲームとか、どうでもいい日常の報告とか。<br className="hidden md:inline" />
+                  気が向いた時に、気まぐれに配信で拾ってあげるかも。<br className="hidden md:inline" />
+                  ……別に、ずっと待ってるわけじゃないけどね.
+                </p>
+              </div>
+
+              {/* ボタン（ホバー時にパステルピンクにふわっと変わる） */}
+              <button className="bg-[#3a3335] hover:bg-[#ffdce3] text-red-300 hover:text-red-400 font-bold py-4 px-8 md:py-5 md:px-16 rounded-full text-sm md:text-base tracking-widest shadow-lg transition-all duration-500 border border-red-300/20 hover:border-pink-200 flex items-center justify-center gap-3 whitespace-nowrap w-[90%] max-w-[320px] mx-auto active:scale-95 z-20 hover:shadow-[0_0_20px_rgba(255,220,227,0.4)]">
+                <svg className="w-5 h-5 md:w-6 md:h-6 opacity-80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v10a2 2 0 002 2z" />
+                </svg>
                 マシュマロを送る
               </button>
+              
             </div>
           </section>
 
@@ -357,7 +382,8 @@ export default function Home() {
               <p className="text-[#a89c9e] text-xs lg:text-sm tracking-[0.4em] mt-4 font-black uppercase">Whimsical Schedule</p>
             </div>
 
-            <div className="relative w-full max-w-2xl h-[80vh] flex flex-col items-center justify-center">
+            {/* PC用の巨大肉球デザイン */}
+            <div className="relative w-full max-w-2xl h-[80vh] hidden md:flex flex-col items-center justify-center">
               <div className="flex gap-16 md:gap-24 mb-[-20px] relative z-10 w-full justify-center h-32">
                 <div className="absolute top-[-130px] left-[-10px]">
                     <PawFinger date="3/13 (水)" title="ホラーゲーム実況" rotate="-rotate-[20deg]" />
@@ -378,23 +404,62 @@ export default function Home() {
               
               <div className="absolute bottom-[-2vh] left-[calc(50%-150px)] w-[300px] h-10 bg-black/30 rounded-[50%] blur-xl opacity-80 z-0"></div>
             </div>
+
+            {/* スマホ用のタイムライン型デザイン */}
+            <div className="w-full max-w-md mx-auto mt-12 md:hidden relative px-4">
+              <div className="absolute left-[38px] top-4 bottom-0 w-[2px] bg-red-400/20"></div>
+
+              <div className="relative pl-14 py-6 mb-4">
+                <div className="absolute left-[26px] top-8 w-6 h-6 bg-[#3a3335] border-2 border-red-400 rounded-full flex items-center justify-center text-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)] z-10">
+                  <FaPaw className="text-[10px]" />
+                </div>
+                <div className="bg-gradient-to-r from-red-500/10 to-[#544b4d]/80 border border-red-400/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                  <div className="absolute -right-4 -bottom-4 text-6xl opacity-5">🐾</div>
+                  <span className="inline-block bg-red-500/20 text-red-300 text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">NEXT LIVE</span>
+                  <h3 className="text-2xl font-black text-[#f4ebeb] tracking-wider mb-2">3/12 (火)</h3>
+                  <p className="text-sm text-[#d1c5c7] font-bold">ゲーム配信 / 雑談</p>
+                </div>
+              </div>
+
+              {[
+                { date: "3/13 (水)", title: "ホラーゲーム実況" },
+                { date: "3/14 (木)", title: "お歌の練習枠" },
+                { date: "3/15 (金)", title: "雑談枠" },
+              ].map((item, i) => (
+                <div key={i} className="relative pl-14 py-3">
+                  <div className="absolute left-[33px] top-[1.8rem] w-3 h-3 bg-red-400/40 rounded-full border-2 border-[#453e40] z-10"></div>
+                  <div className="bg-[#544b4d]/40 border border-white/5 rounded-xl p-4">
+                    <h3 className="text-base font-bold text-red-300 mb-1">{item.date}</h3>
+                    <p className="text-xs text-[#d1c5c7] font-medium">{item.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
 
-          <section id="contact" className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24">
-            <div className="p-12 lg:p-16 bg-gradient-to-br from-[#544b4d] to-[#453e40] border border-red-400/20 rounded-[4rem] text-center shadow-2xl min-h-[60vh] flex flex-col justify-center items-center relative overflow-hidden">
-              <div className="absolute -top-10 -left-10 text-9xl opacity-[0.02] -rotate-45">🐾</div>
-              <div className="absolute -bottom-10 -right-10 text-9xl opacity-[0.02] rotate-12">🐾</div>
+          {/* CONTACTセクション（文字とボタンの見た目を綺麗にした最新版） */}
+          <section id="contact" className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative">
+            <div className="p-10 lg:p-20 bg-gradient-to-br from-[#544b4d] to-[#453e40] border border-red-400/20 rounded-[4rem] text-center shadow-2xl min-h-[60vh] flex flex-col justify-center items-center relative overflow-hidden">
+              
+              <div className="absolute top-10 left-10 text-9xl text-red-300 opacity-[0.02] -rotate-45 pointer-events-none">🐾</div>
+              <div className="absolute bottom-10 right-10 text-9xl text-red-300 opacity-[0.02] rotate-12 pointer-events-none">🐾</div>
+              <div className="absolute top-1/2 left-[-5%] text-8xl text-red-300 opacity-[0.01] rotate-90 pointer-events-none">🐾</div>
+              <div className="absolute top-1/4 right-[-5%] text-8xl text-red-300 opacity-[0.01] -rotate-12 pointer-events-none">🐾</div>
 
-              <p className="text-3xl lg:text-5xl font-black text-red-300 tracking-[0.4em] mb-12 drop-shadow-md flex items-center gap-3">
-                お仕事のご相談は<br></br>こちらへ🐾
+              <h2 className="text-3xl lg:text-5xl font-extrabold text-red-300 tracking-wider mb-10 drop-shadow-md whitespace-pre-wrap">
+                お仕事のご相談は<br />こちらへ🐾
+              </h2>
+
+              <p className="text-lg lg:text-2xl text-[#c2b6b8] leading-loose mb-16 font-medium tracking-wide max-w-xl mx-auto">
+                お仕事やコラボのご相談は<span className="font-bold text-red-300">DM</span>にて承ってます🐾
               </p>
-              <p className="text-lg lg:text-2xl text-[#c2b6b8] leading-loose mb-16 font-bold tracking-wide max-w-xl mx-auto">
-                お仕事やコラボのご相談はDMにて承ってます🐾
-              </p>
-              <div className="py-6 px-16 bg-red-400/90 text-white text-lg lg:text-xl font-black tracking-widest rounded-3xl hover:bg-red-400 transition-all cursor-pointer shadow-[0_8px_30px_rgba(248,113,113,0.3)] hover:scale-105 flex items-center gap-4 group relative overflow-hidden">
-                SEND MESSAGE <span className="text-2xl animate-bounce">🐾</span>
-                  <div className="absolute top-0 left-[-100%] w-full h-full bg-white/10 skew-x-[-20deg] group-hover:left-[100%] transition-all duration-700"></div>
-              </div>
+
+              <button className="flex items-center justify-center gap-4 py-6 px-16 bg-red-400 text-white text-lg lg:text-xl font-bold tracking-wide rounded-full shadow-lg hover:shadow-xl hover:bg-red-500 transition-all duration-300 transform hover:scale-105 group relative overflow-hidden">
+                <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-20deg] group-hover:left-[100%] transition-all duration-700 ease-in-out"></span>
+                <span className="relative z-10">SEND MESSAGE</span>
+                <span className="text-2xl animate-bounce relative z-10">🐾</span>
+              </button>
+              
             </div>
           </section>
 
