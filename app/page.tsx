@@ -163,7 +163,7 @@ export default function Home() {
       if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
       cutTimeoutRef.current = setTimeout(() => {
         setIsTicketCut(false);
-      }, 1500); // 1.5秒で元に戻る
+      }, 1500); 
     }
   };
 
@@ -595,7 +595,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ✅ CONTACTセクション (PC版 - 点線で上下分割！) */}
+          {/* ✅ CONTACTセクション (PC版) */}
           <motion.section 
             id="contact" 
             className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block"
@@ -610,7 +610,6 @@ export default function Home() {
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              {/* 背景のドロップシャドウ */}
               <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
               {/* ✅ チケット上半分 */}
@@ -633,7 +632,6 @@ export default function Home() {
                  <div className="absolute bottom-10 right-10 text-9xl text-[#ffdce3] opacity-[0.05] rotate-12 group-hover:opacity-[0.1] group-hover:scale-110 transition-all duration-500">🐾</div>
               </motion.div>
 
-              {/* ✅ 薄い白（グレー）の点線 */}
               <motion.div 
                 className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 pointer-events-none flex justify-center items-center z-20 px-[22px]"
                 animate={isTicketCut ? { opacity: 0 } : { opacity: 1 }}
@@ -642,40 +640,42 @@ export default function Home() {
                  <div className="w-full border-t-[3px] border-dashed border-gray-300/60 drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]"></div>
               </motion.div>
 
-              {/* ✅ 中身のコンテンツ (上下で分割配置) */}
               <motion.div 
                 className="absolute inset-0 p-10 lg:p-20 flex flex-col justify-between items-center text-center z-30 pointer-events-auto"
                 animate={isTicketCut ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* 点線の上 */}
                 <div className="flex-1 flex items-end justify-center w-full pb-10">
                   <h2 className="text-3xl lg:text-5xl font-extrabold text-white tracking-wider drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] whitespace-pre-wrap group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,1)] transition-all duration-500">
                     お仕事のご相談は<br />こちらへ🐾
                   </h2>
                 </div>
 
-                {/* 点線の下 */}
                 <div className="flex-1 flex flex-col items-center justify-start w-full pt-10">
                   <p className="text-lg lg:text-2xl text-[#c2b6b8] leading-loose mb-10 font-medium tracking-wide group-hover:drop-shadow-[0_0_8px_rgba(255,220,227,0.4)] transition-all duration-500">
                     お仕事やコラボのご相談は<span className="font-bold text-[#ffdce3] drop-shadow-[0_0_10px_rgba(255,220,227,0.6)]">DM</span>にて承ってます🐾
                   </p>
-                  <motion.button 
+                  
+                  {/* ✅ DMリンク付きボタン (PC) */}
+                  <motion.a 
+                    href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
-                    className="flex items-center justify-center gap-4 py-6 px-16 bg-red-400 text-white text-lg lg:text-xl font-bold tracking-wide rounded-full shadow-lg group-hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] group-hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95"
+                    className="flex items-center justify-center gap-4 py-6 px-16 bg-red-400 text-white text-lg lg:text-xl font-bold tracking-wide rounded-full shadow-lg group-hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] group-hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40"
                     onHoverStart={() => setIsHoveringLink(true)}
                     onHoverEnd={() => setIsHoveringLink(false)}
                   >
                     <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-20deg] group-hover/btn:left-[100%] transition-all duration-700 ease-in-out"></span>
                     <span className="relative z-10">SEND MESSAGE</span>
                     <span className="text-2xl animate-bounce relative z-10">🐾</span>
-                  </motion.button>
+                  </motion.a>
                 </div>
               </motion.div>
             </motion.div>
           </motion.section>
 
-          {/* ✅ モバイル版コンタクトセクション (点線で上下分割！) */}
+          {/* ✅ CONTACTセクション (モバイル版) */}
           <motion.section 
             id="contact-mobile" 
             className="px-6 mb-16 max-w-md mx-auto scroll-mt-24 relative md:hidden"
@@ -690,10 +690,8 @@ export default function Home() {
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              {/* ドロップシャドウ */}
               <div className="absolute inset-0 rounded-[2.5rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
-              {/* ✅ チケット上半分 */}
               <motion.div 
                 className="absolute inset-0 bg-[#2a2526] border-2 border-red-300/40 rounded-[2.5rem] pointer-events-none overflow-hidden"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(50% - 10px), calc(100% - 10px) 50%, 10px 50%, 0 calc(50% - 10px))' }}
@@ -703,17 +701,15 @@ export default function Home() {
                  <div className="absolute top-8 left-8 text-8xl text-[#ffdce3] opacity-[0.05] -rotate-45 group-hover:opacity-[0.1] group-hover:scale-110 transition-all duration-500">🐾</div>
               </motion.div>
 
-              {/* ✅ チケット下半分 */}
               <motion.div 
                 className="absolute inset-0 bg-[#2a2526] border-2 border-red-300/40 rounded-[2.5rem] pointer-events-none overflow-hidden"
-                style={{ clipPath: 'polygon(0 calc(50% + 10px), 10px 50%, calc(100% - 10px) 50%, 100% calc(50% + 10px), 100% 100%, 0 100%)' }}
+                style={{ clipPath: 'polygon(0 calc(50% + 10px), 10px 50%, calc(100% - 20px) 50%, 100% calc(50% + 10px), 100% 100%, 0 100%)' }}
                 animate={isTicketCut ? { y: 60, opacity: 0, rotate: 2 } : { y: 0, opacity: 1, rotate: 0 }}
                 transition={{ duration: 0.6, ease: "easeInOut" }}
               >
                  <div className="absolute bottom-8 right-8 text-8xl text-[#ffdce3] opacity-[0.05] rotate-12 group-hover:opacity-[0.1] group-hover:scale-110 transition-all duration-500">🐾</div>
               </motion.div>
 
-              {/* ✅ 薄い白（グレー）の点線 */}
               <motion.div 
                 className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2 pointer-events-none flex justify-center items-center z-20 px-[12px]"
                 animate={isTicketCut ? { opacity: 0 } : { opacity: 1 }}
@@ -722,13 +718,11 @@ export default function Home() {
                  <div className="w-full border-t-[3px] border-dashed border-gray-300/60 drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]"></div>
               </motion.div>
 
-              {/* ✅ 中身のコンテンツ (点線を跨いで改行) */}
               <motion.div 
                 className="absolute inset-0 p-8 flex flex-col justify-between items-center text-center z-30 pointer-events-auto"
                 animate={isTicketCut ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* 点線の上 */}
                 <div className="flex-1 flex flex-col justify-end items-center w-full pb-4">
                   <h2 className="text-2xl font-extrabold text-white tracking-wider drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] mb-4">
                     お仕事のご相談は<br />こちらへ🐾
@@ -738,21 +732,25 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* 点線の下 */}
                 <div className="flex-1 flex flex-col justify-start items-center w-full pt-4">
                   <p className="text-base text-[#c2b6b8] font-medium tracking-wide mb-6">
                     <span className="font-bold text-[#ffdce3]">DM</span>にて承ってます🐾
                   </p>
-                  <motion.button 
+                  
+                  {/* ✅ DMリンク付きボタン (モバイル) */}
+                  <motion.a 
+                    href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
-                    className="flex items-center justify-center gap-4 py-5 px-12 bg-red-400 text-white text-base font-bold tracking-wide rounded-full shadow-lg hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-30 mx-auto"
+                    className="flex items-center justify-center gap-4 py-5 px-12 bg-red-400 text-white text-base font-bold tracking-wide rounded-full shadow-lg hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40 mx-auto"
                     onHoverStart={() => setIsHoveringLink(true)}
                     onHoverEnd={() => setIsHoveringLink(false)}
                   >
                     <span className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-20deg] group-hover/btn:left-[100%] transition-all duration-700 ease-in-out"></span>
                     <span className="relative z-10">SEND MESSAGE</span>
                     <span className="text-2xl animate-bounce relative z-10">🐾</span>
-                  </motion.button>
+                  </motion.a>
                 </div>
               </motion.div>
             </motion.div>
@@ -776,7 +774,9 @@ export default function Home() {
             </div>
 
             <div className="mb-12 flex flex-col items-center gap-6">
-              <span className="text-red-400 text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md">猫喰ぐるる</span>
+            <div className="text-[#f4ebeb] text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md cursor-default">
+              猫喰<span className="text-red-400">ぐるる</span>
+            </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
                 サイト制作🐾: <span className="text-white/80">"政獣たちのいるところ：火日"</span>
