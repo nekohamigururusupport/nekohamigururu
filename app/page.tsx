@@ -102,7 +102,6 @@ export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // ✅チケットのステート
   const [isTicketCut, setIsTicketCut] = useState(false);
   const cutTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -129,11 +128,12 @@ export default function Home() {
   const bgX = useTransform(cursorX, [0, 1200], [-30, 30]);
   const bgY = useTransform(cursorY, [0, 800], [-30, 30]);
 
+  // ✅ SNSリンクに本物のURLを設定！
   const snsLinks = [
-    { n: 'X (Twitter)', icon: <FaXTwitter className="text-lg" />, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
-    { n: 'YouTube', icon: <FaYoutube className="text-lg" />, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
-    { n: 'TwitCasting', icon: <TbBroadcast className="text-lg" />, c: 'bg-sky-400/10 text-sky-200 border-sky-400/20' },
-    { n: 'TikTok', icon: <FaTiktok className="text-lg" />, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
+    { n: 'X (Twitter)', url: 'https://x.com/h_neko20?s=21', icon: <FaXTwitter className="text-lg" />, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
+    { n: 'YouTube', url: 'https://youtube.com/channel/UC_u4f-7IHt12WxU05JNctIQ?si=bzIZIOaWskbPPSX2', icon: <FaYoutube className="text-lg" />, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
+    { n: 'TwitCasting', url: 'https://twitcasting.tv/h_neko20', icon: <TbBroadcast className="text-lg" />, c: 'bg-sky-400/10 text-sky-200 border-sky-400/20' },
+    { n: 'TikTok', url: '#', icon: <FaTiktok className="text-lg" />, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
 
   const isLive = true; 
@@ -156,7 +156,6 @@ export default function Home() {
     };
   }, [mouseX, mouseY]);
 
-  // ✅チケットの切り取りイベント（時間を半分1.5秒に変更！）
   const handleCutTicket = () => {
     if (!isTicketCut) {
       setIsTicketCut(true);
@@ -359,15 +358,20 @@ export default function Home() {
                   </div>
                   <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide">ゲリラ！ちょっとだけ雑談するよ🐾</h3>
                   <p className="text-sm text-[#d1c5c7] mb-6">TwitCastingにて配信中！遊びにきてね！</p>
-                  <motion.button 
+                  
+                  {/* ✅ ツイキャスのURLを設定 */}
+                  <motion.a 
+                    href="https://twitcasting.tv/h_neko20"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
-                    className="bg-red-400 hover:bg-red-50 text-white font-bold py-3 px-8 rounded-full text-xs tracking-widest shadow-lg transition-colors flex items-center gap-2 mx-auto md:mx-0"
+                    className="inline-flex bg-red-400 hover:bg-red-50 text-white font-bold py-3 px-8 rounded-full text-xs tracking-widest shadow-lg transition-colors items-center gap-2 mx-auto md:mx-0"
                     onHoverStart={() => setIsHoveringLink(true)}
                     onHoverEnd={() => setIsHoveringLink(false)}
                   >
                     <TbBroadcast className="text-lg" />
                     配信を見に行く
-                  </motion.button>
+                  </motion.a>
                 </div>
               </div>
             </section>
@@ -399,6 +403,26 @@ export default function Home() {
               </div>
             </div>
           </motion.section>
+
+          {/* ✅ SNSリンクボタンエリア（上部）に <a> タグを適用 */}
+          <section className="py-16 lg:py-24 px-6 relative">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto z-10 relative">
+              {snsLinks.map((sns) => (
+                <a 
+                  key={sns.n} 
+                  href={sns.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}
+                  onMouseEnter={() => setIsHoveringLink(true)}
+                  onMouseLeave={() => setIsHoveringLink(false)}
+                >
+                  {sns.icon}
+                  <span className="mt-[2px]">{sns.n}</span>
+                </a>
+              ))}
+            </div>
+          </section>
 
           <motion.section 
             id="tags"
@@ -462,7 +486,6 @@ export default function Home() {
             </div>
           </motion.section>
 
-          {/* MESSAGE（マシュマロ）セクション */}
           <motion.section 
             id="message"
             className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative"
@@ -470,8 +493,6 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
-            onHoverStart={() => setIsHoveringLink(true)}
-            onHoverEnd={() => setIsHoveringLink(false)}
           >
             <div className="bg-[#544b4d]/80 backdrop-blur-md border border-white/5 rounded-2xl md:rounded-[2.5rem] p-8 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden min-h-[60vh] flex flex-col justify-center items-center group z-10 cursor-pointer transition-all duration-500 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.2)]">
               
@@ -483,12 +504,10 @@ export default function Home() {
                 <FaPaw className="absolute top-[-20px] left-[85%] text-6xl text-[#3a3335] rotate-12" />
               </div>
 
-              {/* 静的なダークレター装飾 */}
               <div className="absolute top-0 left-0 w-full h-[120px] md:h-[200px] border-t border-white/5 bg-gradient-to-b from-white/5 to-transparent [clip-path:polygon(0_0,100%_0,50%_100%)] pointer-events-none z-10"></div>
               <div className="absolute bottom-0 left-0 w-[50%] h-[120px] md:h-[200px] border-l border-white/5 bg-gradient-to-tr from-white/5 to-transparent [clip-path:polygon(0_100%,100%_100%,0_0)] pointer-events-none z-10"></div>
               <div className="absolute bottom-0 right-0 w-[50%] h-[120px] md:h-[200px] border-r border-white/5 bg-gradient-to-tl from-white/5 to-transparent [clip-path:polygon(100%_100%,0_100%,100%_0)] pointer-events-none z-10"></div>
 
-              {/* ホバー時に優しく光るエフェクト */}
               <div className="absolute inset-0 bg-red-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"></div>
 
               <div className="relative mb-8 md:mb-12 z-20 mt-6 group-hover:drop-shadow-[0_0_8px_rgba(255,220,227,0.4)] transition-all duration-300">
@@ -509,6 +528,8 @@ export default function Home() {
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 className="bg-[#3a3335] group-hover:bg-[#453e40] text-red-300 font-bold py-4 px-8 md:py-5 md:px-16 rounded-full text-sm md:text-base tracking-widest shadow-lg transition-all duration-300 border border-red-300/20 flex items-center justify-center gap-3 whitespace-nowrap w-[90%] max-w-[320px] mx-auto active:scale-95 z-20 group-hover:border-red-300"
+                onHoverStart={() => setIsHoveringLink(true)}
+                onHoverEnd={() => setIsHoveringLink(false)}
               >
                 <svg className="w-5 h-5 md:w-6 md:h-6 opacity-80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -519,13 +540,22 @@ export default function Home() {
             </div>
           </motion.section>
 
+          {/* ✅ SNSリンクボタンエリア（中部）に <a> タグを適用 */}
           <section className="py-12 lg:py-24 px-6 border-b border-white/5 mb-32 lg:mb-64">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto">
               {snsLinks.map((sns) => (
-                <div key={`dup-${sns.n}`} className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}>
+                <a 
+                  key={`dup-${sns.n}`} 
+                  href={sns.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}
+                  onMouseEnter={() => setIsHoveringLink(true)}
+                  onMouseLeave={() => setIsHoveringLink(false)}
+                >
                   {sns.icon}
                   <span className="mt-[2px]">{sns.n}</span>
-                </div>
+                </a>
               ))}
             </div>
           </section>
@@ -595,7 +625,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ✅ CONTACTセクション (PC版) */}
           <motion.section 
             id="contact" 
             className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block"
@@ -612,7 +641,6 @@ export default function Home() {
             >
               <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
-              {/* ✅ チケット上半分 */}
               <motion.div 
                 className="absolute inset-0 bg-[#2a2526] border-2 border-red-300/40 rounded-[4rem] pointer-events-none overflow-hidden"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(50% - 20px), calc(100% - 20px) 50%, 20px 50%, 0 calc(50% - 20px))' }}
@@ -622,7 +650,6 @@ export default function Home() {
                  <div className="absolute top-10 left-10 text-9xl text-[#ffdce3] opacity-[0.05] -rotate-45 group-hover:opacity-[0.1] group-hover:scale-110 transition-all duration-500">🐾</div>
               </motion.div>
 
-              {/* ✅ チケット下半分 */}
               <motion.div 
                 className="absolute inset-0 bg-[#2a2526] border-2 border-red-300/40 rounded-[4rem] pointer-events-none overflow-hidden"
                 style={{ clipPath: 'polygon(0 calc(50% + 20px), 20px 50%, calc(100% - 20px) 50%, 100% calc(50% + 20px), 100% 100%, 0 100%)' }}
@@ -656,7 +683,6 @@ export default function Home() {
                     お仕事やコラボのご相談は<span className="font-bold text-[#ffdce3] drop-shadow-[0_0_10px_rgba(255,220,227,0.6)]">DM</span>にて承ってます🐾
                   </p>
                   
-                  {/* ✅ DMリンク付きボタン (PC) */}
                   <motion.a 
                     href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
                     target="_blank"
@@ -675,7 +701,6 @@ export default function Home() {
             </motion.div>
           </motion.section>
 
-          {/* ✅ CONTACTセクション (モバイル版) */}
           <motion.section 
             id="contact-mobile" 
             className="px-6 mb-16 max-w-md mx-auto scroll-mt-24 relative md:hidden"
@@ -736,8 +761,6 @@ export default function Home() {
                   <p className="text-base text-[#c2b6b8] font-medium tracking-wide mb-6">
                     <span className="font-bold text-[#ffdce3]">DM</span>にて承ってます🐾
                   </p>
-                  
-                  {/* ✅ DMリンク付きボタン (モバイル) */}
                   <motion.a 
                     href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
                     target="_blank"
@@ -763,20 +786,30 @@ export default function Home() {
             </p>
           </section>
 
+          {/* ✅ フッターの「猫喰」を白にする修正を反映 */}
           <footer className="py-20 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto mb-16">
               {snsLinks.map((sns) => (
-                <div key={`footer-${sns.n}`} className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-[11px] font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2`}>
+                <a 
+                  key={`footer-${sns.n}`} 
+                  href={sns.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-[11px] font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2`}
+                  onMouseEnter={() => setIsHoveringLink(true)}
+                  onMouseLeave={() => setIsHoveringLink(false)}
+                >
                   {sns.icon}
                   <span className="mt-[2px]">{sns.n}</span>
-                </div>
+                </a>
               ))}
             </div>
 
             <div className="mb-12 flex flex-col items-center gap-6">
-            <div className="text-[#f4ebeb] text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md cursor-default">
-              猫喰<span className="text-red-400">ぐるる</span>
-            </div>
+              {/* 猫喰を白に修正！ */}
+              <div className="text-[#f4ebeb] text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md cursor-default">
+                猫喰<span className="text-red-400 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
+              </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
                 サイト制作🐾: <span className="text-white/80">"政獣たちのいるところ：火日"</span>
