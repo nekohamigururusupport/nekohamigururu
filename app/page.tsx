@@ -398,7 +398,7 @@ export default function Home() {
                 <div className="bg-[#453e40] p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-white/5 space-y-4 md:space-y-8 shadow-inner w-full">
                   <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">7月18日</span></div>
                   <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">好きなもの</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">ゲーム</span></div>
-                  <div className="flex justify-between pb-1 md:pb-2"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">ファンマーク</span><span className="text-lg md:text-xl lg:text-2xl text-[#f4ebeb]">🐾🦴</span></div>
+                  <div className="flex justify-between pb-1 md:pb-2"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">ファンマーク</span><span className="text-lg md:text-xl lg:text-2xl text-[#f4ebeb]">🐈‍⬛⛓️</span></div>
                 </div>
               </div>
             </div>
