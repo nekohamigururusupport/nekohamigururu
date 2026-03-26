@@ -58,9 +58,14 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
             key={i}
             className={`text-5xl md:text-7xl lg:text-8xl font-black ${
               i < 2 
-                ? 'text-[#f4ebeb] drop-shadow-md' 
-                : 'text-red-400 drop-shadow-[0_0_15px_rgba(244,114,182,0.8)]' 
+                ? 'text-[#f4ebeb]' 
+                : 'text-red-400' 
             }`}
+            style={{ 
+              filter: i < 2 
+                ? "drop-shadow(0 0 8px rgba(244,114,182,0.2))" 
+                : "drop-shadow(0 0 5px #f472b6) drop-shadow(0 0 15px #f472b6)" 
+            }}
             initial={{ opacity: 0, x: -50, filter: "blur(10px)" }}
             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             transition={{ delay: 0.5 + i * 0.12, duration: 0.6, type: "spring", stiffness: 100 }}
@@ -129,7 +134,6 @@ export default function Home() {
   const bgY = useTransform(cursorY, [0, 800], [-30, 30]);
 
   // ✅ カレンダー用state
-  // 常に4つのデータが入る前提で作るため、初期値にダミーを入れておく
   const [nextLive, setNextLive] = useState<{date: string, title: string}>({ date: "読込中🐾", title: "..." });
   const [scheduleList, setScheduleList] = useState<{date: string, title: string}[]>([
     { date: "未定🐾", title: "COMING SOON" },
@@ -137,7 +141,7 @@ export default function Home() {
     { date: "未定🐾", title: "COMING SOON" }
   ]);
 
-  // ✅ カレンダー取得Effect（COMING SOON 埋め合わせ完全版！）
+  // ✅ カレンダー取得Effect
   useEffect(() => {
     const fetchCalendar = async () => {
       const CALENDAR_ID = 'nekohami.gururu.support@gmail.com';
@@ -160,12 +164,11 @@ export default function Home() {
             const days = ['日', '月', '火', '水', '木', '金', '土'];
             const dayOfWeek = days[dateObj.getDay()];
 
-            // 時間の計算
             let timeString = '';
             if (event.start.dateTime) {
               const hours = dateObj.getHours();
               const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-              timeString = `${hours}:${minutes}〜\n`; // 時間の下で改行する
+              timeString = `${hours}:${minutes}〜\n`; 
             }
 
             return {
@@ -175,7 +178,6 @@ export default function Home() {
           });
         }
 
-        // 魔法：予定が4個未満なら残りを COMING SOON で埋める！
         while (formattedEvents.length < 4) {
           formattedEvents.push({
             date: "未定🐾",
@@ -188,7 +190,6 @@ export default function Home() {
 
       } catch (error) {
         console.error('カレンダーの取得に失敗したぜ:', error);
-        // エラー時もレイアウトを崩さないように埋める
         const fallback = Array(4).fill({ date: "未定🐾", title: "COMING SOON" });
         setNextLive(fallback[0]);
         setScheduleList(fallback.slice(1, 4));
@@ -205,7 +206,7 @@ export default function Home() {
     { n: 'TikTok', url: '#', icon: <FaTiktok className="text-lg" />, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
 
-  // ▼▼▼ 追加：ツイキャスAPIでライブ状態を管理するStateとEffect ▼▼▼
+  // ✅ ツイキャスAPI用
   const [liveInfo, setLiveInfo] = useState<{ isLive: boolean, title: string, url: string }>({
     isLive: false,
     title: '',
@@ -231,7 +232,6 @@ export default function Home() {
 
     checkLiveStatus();
   }, []);
-  // ▲▲▲ 追加ここまで ▲▲▲
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -261,15 +261,10 @@ export default function Home() {
     }
   };
 
-
   // ==========================================
   // ✅ 対策2：公開フラグ（魔法の1行！）
   // ==========================================
-  // ローカル（パソコンでのテスト中）は true(本編表示)、Vercel（本番）では false(準備中) になる
   const isReleased = process.env.NODE_ENV === 'development'; 
-
-  // ※デビューして世界中に公開する時は、上の行を消して↓の行にするだけ！
-  // const isReleased = true; 
 
   if (!isReleased) {
     return (
@@ -292,8 +287,9 @@ export default function Home() {
             >
               <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-4 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
               
-              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[10px] md:tracking-[20px] drop-shadow-md whitespace-nowrap ml-[10px] md:ml-[20px]">
-                猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
+              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[10px] md:tracking-[20px] whitespace-nowrap ml-[10px] md:ml-[20px]">
+                猫喰
+                <span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
               </h1>
               
               <div className="w-24 h-[2px] bg-red-400/50 rounded-full mt-4"></div>
@@ -468,10 +464,26 @@ export default function Home() {
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
                 新人Vtuber
               </div>
-              <h1 className="text-[38px] md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight drop-shadow-md whitespace-nowrap">
+              <h1 className="text-[38px] md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight whitespace-nowrap ml-[10px] md:ml-[20px]">
                 猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
               </h1>
-              <p className="text-[#c2b6b8] text-[10px] md:text-xs lg:text-sm tracking-[1em] mt-2 font-bold uppercase">Nekohami Gururu</p>
+              
+              {/* ▼ デザイン・位置 復元：文字間隔と上マージンを元に戻したぜ！ ▼ */}
+              <p className="text-[#c2b6b8] text-[10px] md:text-xs lg:text-sm tracking-[1em] mt-2 font-bold uppercase">
+                NEKOHAMI GURURU
+              </p>
+              {/* ▲ 復元ここまで ▲ */}
+
+              {/* ▼ 案1ベース：ふわっとピンクネオン ＆ 「新人Vtuber」をファンマークで挟む！ ▼ */}
+              <p className="text-[32px] md:text-[40px] text-[#ffdce3] mt-6 mb-2 font-bold tracking-widest whitespace-nowrap drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] flex items-center justify-center md:justify-start gap-2">
+                手懐けられないわがまま猫な
+                <span className="inline-flex items-center gap-1 mx-2">
+                  <span className="text-[24px] md:text-[30px] opacity-90">🐈‍⬛</span>
+                  新人Vtuber
+                  <span className="text-[24px] md:text-[30px] opacity-90">⛓️</span>
+                </span>
+              </p>
+              {/* ▲ サブタイトルここまで ▲ */}
             </div>
 
             <div 
@@ -503,7 +515,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ▼▼▼ 変更：条件を liveInfo.isLive に差し替え ▼▼▼ */}
           {liveInfo.isLive && (
             <section className="px-6 md:px-24 lg:px-40 mb-12 max-w-7xl mx-auto scroll-mt-24 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/5 opacity-5 z-0 rounded-[2rem]"></div>
@@ -516,12 +527,11 @@ export default function Home() {
                   <div className="inline-block bg-red-500 text-white text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">
                     🔴 NOW LIVE
                   </div>
-                  {/* ▼ 変更：ツイキャスから取得した本物のタイトルを表示 ▼ */}
                   <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide">{liveInfo.title}</h3>
                   <p className="text-sm text-[#d1c5c7] mb-6">TwitCastingにて配信中！遊びにきてね！</p>
                   
                   <motion.a 
-                    href={liveInfo.url} // ▼ 変更：ツイキャスから取得したURL ▼
+                    href={liveInfo.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
