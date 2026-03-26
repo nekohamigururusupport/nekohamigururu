@@ -94,7 +94,7 @@ const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotat
   >
     <div className="absolute top-[-22%] left-[calc(50%-10px)] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[18px] border-b-red-400 opacity-80 z-[-1] transition-transform duration-300 group-hover:scale-110"></div>
     <span className="text-sm md:text-base font-bold text-red-300">{date}</span>
-    <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium">{title}</span>
+    <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium whitespace-pre-wrap">{title}</span>
   </motion.div>
 );
 
@@ -128,7 +128,76 @@ export default function Home() {
   const bgX = useTransform(cursorX, [0, 1200], [-30, 30]);
   const bgY = useTransform(cursorY, [0, 800], [-30, 30]);
 
-  // ✅ SNSリンクに本物のURLを設定！
+  // ✅ カレンダー用state
+  // 常に4つのデータが入る前提で作るため、初期値にダミーを入れておく
+  const [nextLive, setNextLive] = useState<{date: string, title: string}>({ date: "読込中🐾", title: "..." });
+  const [scheduleList, setScheduleList] = useState<{date: string, title: string}[]>([
+    { date: "未定🐾", title: "COMING SOON" },
+    { date: "未定🐾", title: "COMING SOON" },
+    { date: "未定🐾", title: "COMING SOON" }
+  ]);
+
+  // ✅ カレンダー取得Effect（COMING SOON 埋め合わせ完全版！）
+  useEffect(() => {
+    const fetchCalendar = async () => {
+      const CALENDAR_ID = 'nekohami.gururu.support@gmail.com';
+      const API_KEY = 'AIzaSyCKOGDhl1RNvjCSic6vKnYl30iks9PceQs'; 
+      
+      const timeMin = new Date().toISOString();
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?key=${API_KEY}&timeMin=${timeMin}&singleEvents=true&orderBy=startTime&maxResults=4`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        let formattedEvents: { date: string, title: string }[] = [];
+
+        if (data.items && data.items.length > 0) {
+          formattedEvents = data.items.map((event: any) => {
+            const dateObj = new Date(event.start.dateTime || event.start.date);
+            const month = dateObj.getMonth() + 1;
+            const day = dateObj.getDate();
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            const dayOfWeek = days[dateObj.getDay()];
+
+            // 時間の計算
+            let timeString = '';
+            if (event.start.dateTime) {
+              const hours = dateObj.getHours();
+              const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+              timeString = `${hours}:${minutes}〜\n`; // 時間の下で改行する
+            }
+
+            return {
+              date: `${month}/${day} (${dayOfWeek})`,
+              title: `${timeString}${event.summary || '秘密の予定🐾'}`
+            };
+          });
+        }
+
+        // 魔法：予定が4個未満なら残りを COMING SOON で埋める！
+        while (formattedEvents.length < 4) {
+          formattedEvents.push({
+            date: "未定🐾",
+            title: "COMING SOON"
+          });
+        }
+
+        setNextLive(formattedEvents[0]);
+        setScheduleList(formattedEvents.slice(1, 4));
+
+      } catch (error) {
+        console.error('カレンダーの取得に失敗したぜ:', error);
+        // エラー時もレイアウトを崩さないように埋める
+        const fallback = Array(4).fill({ date: "未定🐾", title: "COMING SOON" });
+        setNextLive(fallback[0]);
+        setScheduleList(fallback.slice(1, 4));
+      }
+    };
+
+    fetchCalendar();
+  }, []);
+
   const snsLinks = [
     { n: 'X (Twitter)', url: 'https://x.com/h_neko20?s=21', icon: <FaXTwitter className="text-lg" />, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
     { n: 'YouTube', url: 'https://youtube.com/channel/UC_u4f-7IHt12WxU05JNctIQ?si=bzIZIOaWskbPPSX2', icon: <FaYoutube className="text-lg" />, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
@@ -166,6 +235,70 @@ export default function Home() {
     }
   };
 
+
+  // ==========================================
+  // ✅ 対策2：公開フラグ（魔法の1行！）
+  // ==========================================
+  // ローカル（パソコンでのテスト中）は true(本編表示)、Vercel（本番）では false(準備中) になる
+  const isReleased = process.env.NODE_ENV === 'development'; 
+
+  // ※デビューして世界中に公開する時は、上の行を消して↓の行にするだけ！
+  // const isReleased = true; 
+
+  if (!isReleased) {
+    return (
+      <>
+        <AnimatePresence>
+          {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+        </AnimatePresence>
+
+        {!showSplash && (
+          <main className="min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 flex flex-col items-center justify-center relative overflow-hidden">
+            <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-0"></div>
+            <GlassPawBG className="w-64 h-64 top-[10%] left-[10%] rotate-12" />
+            <GlassPawBG className="w-40 h-40 bottom-[20%] right-[10%] -rotate-45" />
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="relative z-10 flex flex-col items-center gap-8 p-6 text-center"
+            >
+              <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-4 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
+              
+              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[10px] md:tracking-[20px] drop-shadow-md whitespace-nowrap ml-[10px] md:ml-[20px]">
+                猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
+              </h1>
+              
+              <div className="w-24 h-[2px] bg-red-400/50 rounded-full mt-4"></div>
+              
+              <p className="text-2xl md:text-4xl text-red-300 font-black tracking-[0.3em] md:tracking-[0.5em] drop-shadow-[0_0_8px_rgba(248,113,113,0.6)] mt-2">
+                COMING SOON
+              </p>
+              
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <p className="text-[#a89c9e] text-sm md:text-base font-bold tracking-[0.2em] border border-white/10 bg-white/5 px-6 py-2 rounded-full backdrop-blur-sm">
+                  2026 DEBUT🐾
+                </p>
+                <a 
+                  href="https://x.com/h_neko20?s=21" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-red-300/80 hover:text-red-400 text-xs tracking-widest mt-4 flex items-center gap-2 transition-colors"
+                >
+                  <FaXTwitter /> Official X をフォローして待っててね！
+                </a>
+              </div>
+            </motion.div>
+          </main>
+        )}
+      </>
+    );
+  }
+  // ==========================================
+
+
+  // 🚀 👇ここから下はデビュー後に表示される本物のサイトコード👇 🚀
   return (
     <>
       <AnimatePresence>
@@ -359,7 +492,6 @@ export default function Home() {
                   <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide">ゲリラ！ちょっとだけ雑談するよ🐾</h3>
                   <p className="text-sm text-[#d1c5c7] mb-6">TwitCastingにて配信中！遊びにきてね！</p>
                   
-                  {/* ✅ ツイキャスのURLを設定 */}
                   <motion.a 
                     href="https://twitcasting.tv/h_neko20"
                     target="_blank"
@@ -404,7 +536,6 @@ export default function Home() {
             </div>
           </motion.section>
 
-          {/* ✅ SNSリンクボタンエリア（上部）に <a> タグを適用 */}
           <section className="py-16 lg:py-24 px-6 relative">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto z-10 relative">
               {snsLinks.map((sns) => (
@@ -493,6 +624,8 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
+            onHoverStart={() => setIsHoveringLink(true)}
+            onHoverEnd={() => setIsHoveringLink(false)}
           >
             <div className="bg-[#544b4d]/80 backdrop-blur-md border border-white/5 rounded-2xl md:rounded-[2.5rem] p-8 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden min-h-[60vh] flex flex-col justify-center items-center group z-10 cursor-pointer transition-all duration-500 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.2)]">
               
@@ -540,7 +673,6 @@ export default function Home() {
             </div>
           </motion.section>
 
-          {/* ✅ SNSリンクボタンエリア（中部）に <a> タグを適用 */}
           <section className="py-12 lg:py-24 px-6 border-b border-white/5 mb-32 lg:mb-64">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto">
               {snsLinks.map((sns) => (
@@ -578,12 +710,14 @@ export default function Home() {
               <div>スケジュール</div>
             </h2>
 
+            {/* --- PC版表示 --- */}
             <div className="relative w-full max-w-2xl h-[80vh] hidden md:flex flex-col items-center justify-center">
               <div className="flex gap-16 md:gap-24 mb-[-20px] relative z-10 w-full justify-center h-32">
-                <div className="absolute top-[-130px] left-[-10px]"><PawFinger date="3/13 (水)" title="ホラーゲーム実況" rotate="-rotate-[20deg]" /></div>
-                <div className="absolute top-[-190px] left-[calc(50%-4.5rem)] md:left-[calc(50%-5rem)] z-10"><PawFinger date="3/14 (木)" title="お歌の練習枠" rotate="rotate-0" /></div>
-                <div className="absolute top-[-130px] right-[-10px]"><PawFinger date="3/15 (金)" title="雑談枠" rotate="rotate-[20deg]" /></div>
+                <div className="absolute top-[-130px] left-[-10px]"><PawFinger date={scheduleList[0].date} title={scheduleList[0].title} rotate="-rotate-[20deg]" /></div>
+                <div className="absolute top-[-190px] left-[calc(50%-4.5rem)] md:left-[calc(50%-5rem)] z-10"><PawFinger date={scheduleList[1].date} title={scheduleList[1].title} rotate="rotate-0" /></div>
+                <div className="absolute top-[-130px] right-[-10px]"><PawFinger date={scheduleList[2].date} title={scheduleList[2].title} rotate="rotate-[20deg]" /></div>
               </div>
+              
               <motion.div 
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -592,33 +726,34 @@ export default function Home() {
                 onHoverEnd={() => setIsHoveringLink(false)}
               >
                 <div className="inline-block bg-red-500/20 text-red-300 text-xs font-black tracking-widest px-5 py-2 rounded-full mb-6 animate-pulse">NEXT LIVE</div>
-                <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">3月12日（火）</span>
-                <span className="text-lg md:text-xl text-[#d1c5c7] font-bold border-t border-white/10 pt-6 w-3/4 text-center leading-relaxed">ゲーム配信 / 雑談</span>
+                <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">{nextLive.date}</span>
+                <span className="text-lg md:text-xl text-[#d1c5c7] font-bold border-t border-white/10 pt-6 w-3/4 text-center leading-relaxed whitespace-pre-wrap">{nextLive.title}</span>
               </motion.div>
               <div className="absolute bottom-[-2vh] left-[calc(50%-150px)] w-[300px] h-10 bg-black/30 rounded-[50%] blur-xl opacity-80 z-0"></div>
             </div>
 
+            {/* --- スマホ版表示 --- */}
             <div className="w-full max-w-md mx-auto mt-12 md:hidden relative px-4">
               <div className="absolute left-[38px] top-4 bottom-0 w-[2px] bg-red-400/20"></div>
+              
+              {/* NEXT LIVE */}
               <div className="relative pl-14 py-6 mb-4">
                 <div className="absolute left-[26px] top-8 w-6 h-6 bg-[#3a3335] border-2 border-red-400 rounded-full flex items-center justify-center text-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)] z-10"><FaPaw className="text-[10px]" /></div>
                 <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-r from-red-500/10 to-[#544b4d]/80 border border-red-400/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute -right-4 -bottom-4 text-6xl opacity-5">🐾</div>
                   <span className="inline-block bg-red-500/20 text-red-300 text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">NEXT LIVE</span>
-                  <h3 className="text-2xl font-black text-[#f4ebeb] tracking-wider mb-2">3/12 (火)</h3>
-                  <p className="text-sm text-[#d1c5c7] font-bold">ゲーム配信 / 雑談</p>
+                  <h3 className="text-2xl font-black text-[#f4ebeb] tracking-wider mb-2">{nextLive.date}</h3>
+                  <p className="text-sm text-[#d1c5c7] font-bold whitespace-pre-wrap">{nextLive.title}</p>
                 </motion.div>
               </div>
-              {[
-                { date: "3/13 (水)", title: "ホラーゲーム実況" },
-                { date: "3/14 (木)", title: "お歌の練習枠" },
-                { date: "3/15 (金)", title: "雑談枠" },
-              ].map((item, i) => (
+              
+              {/* それ以降の予定 */}
+              {scheduleList.map((item, i) => (
                 <div key={i} className="relative pl-14 py-3">
                   <div className="absolute left-[33px] top-[1.8rem] w-3 h-3 bg-red-400/40 rounded-full border-2 border-[#453e40] z-10"></div>
                   <motion.div whileHover={{ scale: 1.05 }} className="bg-[#544b4d]/40 border border-white/5 rounded-xl p-4">
                     <h3 className="text-base font-bold text-red-300 mb-1">{item.date}</h3>
-                    <p className="text-xs text-[#d1c5c7] font-medium">{item.title}</p>
+                    <p className="text-xs text-[#d1c5c7] font-medium whitespace-pre-wrap">{item.title}</p>
                   </motion.div>
                 </div>
               ))}
@@ -786,7 +921,6 @@ export default function Home() {
             </p>
           </section>
 
-          {/* ✅ フッターの「猫喰」を白にする修正を反映 */}
           <footer className="py-20 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto mb-16">
               {snsLinks.map((sns) => (
@@ -806,7 +940,6 @@ export default function Home() {
             </div>
 
             <div className="mb-12 flex flex-col items-center gap-6">
-              {/* 猫喰を白に修正！ */}
               <div className="text-[#f4ebeb] text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md cursor-default">
                 猫喰<span className="text-red-400 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
               </div>
