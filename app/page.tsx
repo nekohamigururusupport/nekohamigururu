@@ -205,7 +205,33 @@ export default function Home() {
     { n: 'TikTok', url: '#', icon: <FaTiktok className="text-lg" />, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
 
-  const isLive = true; 
+  // ▼▼▼ 追加：ツイキャスAPIでライブ状態を管理するStateとEffect ▼▼▼
+  const [liveInfo, setLiveInfo] = useState<{ isLive: boolean, title: string, url: string }>({
+    isLive: false,
+    title: '',
+    url: ''
+  });
+
+  useEffect(() => {
+    const checkLiveStatus = async () => {
+      try {
+        const res = await fetch('/api/live');
+        const data = await res.json();
+        if (data.isLive) {
+          setLiveInfo({
+            isLive: true,
+            title: data.title,
+            url: data.url
+          });
+        }
+      } catch (error) {
+        console.error('配信状態のチェックに失敗したぜ:', error);
+      }
+    };
+
+    checkLiveStatus();
+  }, []);
+  // ▲▲▲ 追加ここまで ▲▲▲
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -477,7 +503,8 @@ export default function Home() {
             </div>
           </section>
 
-          {isLive && (
+          {/* ▼▼▼ 変更：条件を liveInfo.isLive に差し替え ▼▼▼ */}
+          {liveInfo.isLive && (
             <section className="px-6 md:px-24 lg:px-40 mb-12 max-w-7xl mx-auto scroll-mt-24 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/5 opacity-5 z-0 rounded-[2rem]"></div>
               <div className="bg-gradient-to-r from-red-500/15 to-[#544b4d]/90 border border-red-400/30 rounded-[2rem] p-6 lg:p-8 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_20px_rgba(248,113,113,0.15)] relative overflow-hidden z-10">
@@ -489,11 +516,12 @@ export default function Home() {
                   <div className="inline-block bg-red-500 text-white text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">
                     🔴 NOW LIVE
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide">ゲリラ！ちょっとだけ雑談するよ🐾</h3>
+                  {/* ▼ 変更：ツイキャスから取得した本物のタイトルを表示 ▼ */}
+                  <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide">{liveInfo.title}</h3>
                   <p className="text-sm text-[#d1c5c7] mb-6">TwitCastingにて配信中！遊びにきてね！</p>
                   
                   <motion.a 
-                    href="https://twitcasting.tv/h_neko20"
+                    href={liveInfo.url} // ▼ 変更：ツイキャスから取得したURL ▼
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
