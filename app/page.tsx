@@ -459,7 +459,7 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-16 lg:mb-32 relative scroll-mt-24 gap-12 md:gap-0 -translate-y-10 md:translate-y-0">
+          <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-28 md:pt-16 lg:mb-32 relative scroll-mt-24 gap-12 md:gap-0">
             <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-10 flex flex-col items-center md:items-start">
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
                 新人Vtuber
@@ -468,22 +468,36 @@ export default function Home() {
                 猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
               </h1>
               
-              {/* ▼ デザイン・位置 復元：文字間隔と上マージンを元に戻したぜ！ ▼ */}
-              <p className="text-[#c2b6b8] text-[10px] md:text-xs lg:text-sm tracking-[1em] mt-2 font-bold uppercase">
+              <p className="text-[#c2b6b8] text-[10px] md:text-xs lg:text-[21px] tracking-[1em] mt-2 font-bold uppercase lg:ml-[30px]">
                 NEKOHAMI GURURU
               </p>
-              {/* ▲ 復元ここまで ▲ */}
 
-              {/* ▼ 案1ベース：ふわっとピンクネオン ＆ 「新人Vtuber」をファンマークで挟む！ ▼ */}
-              <p className="text-[32px] md:text-[40px] text-[#ffdce3] mt-6 mb-2 font-bold tracking-widest whitespace-nowrap drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] flex items-center justify-center md:justify-start gap-2">
-                手懐けられないわがまま猫な
-                <span className="inline-flex items-center gap-1 mx-2">
-                  <span className="text-[24px] md:text-[30px] opacity-90">🐈‍⬛</span>
-                  新人Vtuber
-                  <span className="text-[24px] md:text-[30px] opacity-90">⛓️</span>
+              {/* ========================================== */}
+              {/* ▼ PC用サブタイトル（スマホでは消える） ▼ */}
+              {/* ========================================== */}
+              <div className="hidden md:flex items-center justify-start mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] whitespace-nowrap w-full">
+                <span className="text-[28px] lg:text-[40px]">手懐けられないわがまま猫な</span>
+                {/* 絵文字が割れないように tracking-normal と flex-row を指定 */}
+                <span className="flex flex-row items-center mx-3 whitespace-nowrap">
+                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                  <span className="text-[28px] lg:text-[40px] mx-3">新人Vtuber</span>
+                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
                 </span>
-              </p>
-              {/* ▲ サブタイトルここまで ▲ */}
+              </div>
+
+              {/* ========================================== */}
+              {/* ▼ スマホ用サブタイトル（PCでは消える） ▼ */}
+              {/* ========================================== */}
+              <div className="flex md:hidden flex-col items-center justify-center mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full">
+                <span className="text-[17px] sm:text-[20px] whitespace-nowrap">手懐けられないわがまま猫な</span>
+                {/* 絵文字が割れないように tracking-normal と flex-row を指定 */}
+                <span className="flex flex-row items-center mt-2 whitespace-nowrap">
+                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                  <span className="text-[22px] sm:text-[24px] mx-2">新人Vtuber</span>
+                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                </span>
+              </div>
+              
             </div>
 
             <div 
