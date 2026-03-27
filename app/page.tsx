@@ -141,17 +141,22 @@ export default function Home() {
     { date: "未定🐾", title: "COMING SOON" }
   ]);
 
-  // ✅ カレンダー取得Effect
+  // ✅ カレンダー取得Effect（裏口経由で安全に！）
   useEffect(() => {
     const fetchCalendar = async () => {
-      const CALENDAR_ID = 'nekohami.gururu.support@gmail.com';
-      const API_KEY = 'AIzaSyCKOGDhl1RNvjCSic6vKnYl30iks9PceQs'; 
-      
-      const timeMin = new Date().toISOString();
-      const url = `https://www.googleapis.com/calendar/v3/calendars/${CALENDAR_ID}/events?key=${API_KEY}&timeMin=${timeMin}&singleEvents=true&orderBy=startTime&maxResults=4`;
-
       try {
-        const res = await fetch(url);
+        const res = await fetch('/api/calendar');
+        
+        // ▼ 修正：throw new Error をやめて、静かにCOMING SOONを表示させる！ ▼
+        if (!res.ok) {
+          console.warn('裏口(API)が鍵を見つけられなかったぜ！COMING SOONを表示するぞ！');
+          const fallback = Array(4).fill({ date: "未定🐾", title: "COMING SOON" });
+          setNextLive(fallback[0]);
+          setScheduleList(fallback.slice(1, 4));
+          return;
+        }
+        // ▲ 修正ここまで ▲
+
         const data = await res.json();
 
         let formattedEvents: { date: string, title: string }[] = [];
@@ -219,6 +224,14 @@ export default function Home() {
     const checkLiveStatus = async () => {
       try {
         const res = await fetch('/api/live');
+        
+        // ▼ 修正：こっちも静かに止める！ ▼
+        if (!res.ok) {
+          console.warn('配信APIがエラーを返したぜ！');
+          return;
+        }
+        // ▲ 修正ここまで ▲
+
         const data = await res.json();
         if (data.isLive) {
           setLiveInfo({
@@ -494,9 +507,9 @@ export default function Home() {
               <div className="flex md:hidden flex-col items-center justify-center mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full">
                 <span className="text-[17px] sm:text-[20px] whitespace-nowrap">手懐けられないわがまま猫な</span>
                 <span className="flex flex-row items-center mt-2 whitespace-nowrap">
-                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛</span>
                   <span className="text-[22px] sm:text-[24px] mx-2">新人Vtuber</span>
-                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
               
@@ -590,7 +603,7 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 lg:gap-10 items-center w-full">
                 <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16px] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
                   <p>猫喰ぐるる（Nekohami Gururu）<br className="hidden md:inline" />ポップな可愛さの裏に魚の骨のような<br className="hidden md:inline" />鋭いこだわりを隠し持つ<br className="hidden md:inline" />新人Vチューバー</p>
-                  <p>ゲーム実況や歌ってみたを中心に<br className="hidden md:inline" />リスナーの皆と楽しく<br className="hidden md:inline" />空間を作っていくよ！</p>
+                  <p>ゲーム実況や歌ってみたを中心に<br className="hidden md:inline" />リスナーの皆と楽しい<br className="hidden md:inline" />空間を作っていくよ！</p>
                 </div>
                 <div className="bg-[#453e40] p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-white/5 space-y-4 md:space-y-8 shadow-inner w-full">
                   <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">7月18日</span></div>
