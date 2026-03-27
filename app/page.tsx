@@ -206,11 +206,13 @@ export default function Home() {
     { n: 'TikTok', url: '#', icon: <FaTiktok className="text-lg" />, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
 
-  // ✅ ツイキャスAPI用
-  const [liveInfo, setLiveInfo] = useState<{ isLive: boolean, title: string, url: string }>({
+  // ✅ ツイキャス＆YouTube API用
+  const [liveInfo, setLiveInfo] = useState<{ isLive: boolean, platform: string, title: string, url: string, thumbnail: string }>({
     isLive: false,
+    platform: '',
     title: '',
-    url: ''
+    url: '',
+    thumbnail: ''
   });
 
   useEffect(() => {
@@ -221,8 +223,10 @@ export default function Home() {
         if (data.isLive) {
           setLiveInfo({
             isLive: true,
+            platform: data.platform,
             title: data.title,
-            url: data.url
+            url: data.url,
+            thumbnail: data.thumbnail || ''
           });
         }
       } catch (error) {
@@ -477,7 +481,6 @@ export default function Home() {
               {/* ========================================== */}
               <div className="hidden md:flex items-center justify-start mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] whitespace-nowrap w-full">
                 <span className="text-[28px] lg:text-[40px]">手懐けられないわがまま猫な</span>
-                {/* 絵文字が割れないように tracking-normal と flex-row を指定 */}
                 <span className="flex flex-row items-center mx-3 whitespace-nowrap">
                   <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
                   <span className="text-[28px] lg:text-[40px] mx-3">新人Vtuber</span>
@@ -490,7 +493,6 @@ export default function Home() {
               {/* ========================================== */}
               <div className="flex md:hidden flex-col items-center justify-center mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full">
                 <span className="text-[17px] sm:text-[20px] whitespace-nowrap">手懐けられないわがまま猫な</span>
-                {/* 絵文字が割れないように tracking-normal と flex-row を指定 */}
                 <span className="flex flex-row items-center mt-2 whitespace-nowrap">
                   <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
                   <span className="text-[22px] sm:text-[24px] mx-2">新人Vtuber</span>
@@ -529,37 +531,48 @@ export default function Home() {
             </div>
           </section>
 
+          {/* ▼▼▼ YouTubeとツイキャスでデザインが変わるハイブリッドバナー ▼▼▼ */}
           {liveInfo.isLive && (
             <section className="px-6 md:px-24 lg:px-40 mb-12 max-w-7xl mx-auto scroll-mt-24 relative overflow-hidden">
               <div className="absolute inset-0 bg-white/5 opacity-5 z-0 rounded-[2rem]"></div>
-              <div className="bg-gradient-to-r from-red-500/15 to-[#544b4d]/90 border border-red-400/30 rounded-[2rem] p-6 lg:p-8 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_20px_rgba(248,113,113,0.15)] relative overflow-hidden z-10">
-                <div className="absolute -right-10 top-0 text-red-500/5 text-9xl rotate-12">🐾</div>
-                <div className="w-full md:w-72 aspect-video bg-[#3a3335] rounded-2xl flex items-center justify-center text-sm text-gray-500 shadow-inner border border-white/5">
-                  配信サムネイル
+              <div className={`bg-gradient-to-r ${liveInfo.platform === 'youtube' ? 'from-red-600/20' : 'from-sky-500/15'} to-[#544b4d]/90 border ${liveInfo.platform === 'youtube' ? 'border-red-500/30' : 'border-sky-400/30'} rounded-[2rem] p-6 lg:p-8 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_20px_rgba(248,113,113,0.1)] relative overflow-hidden z-10`}>
+                <div className={`absolute -right-10 top-0 ${liveInfo.platform === 'youtube' ? 'text-red-500/5' : 'text-sky-500/5'} text-9xl rotate-12`}>🐾</div>
+                
+                {/* サムネイル部分 */}
+                <div className="w-full md:w-72 aspect-video bg-[#3a3335] rounded-2xl flex items-center justify-center text-sm text-gray-500 shadow-inner border border-white/5 overflow-hidden">
+                  {liveInfo.thumbnail ? (
+                    <img src={liveInfo.thumbnail} alt="配信サムネイル" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>配信サムネイル🐾</span>
+                  )}
                 </div>
+
                 <div className="flex-1 text-center md:text-left">
                   <div className="inline-block bg-red-500 text-white text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">
                     🔴 NOW LIVE
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide">{liveInfo.title}</h3>
-                  <p className="text-sm text-[#d1c5c7] mb-6">TwitCastingにて配信中！遊びにきてね！</p>
+                  <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide line-clamp-2">{liveInfo.title}</h3>
+                  <p className="text-sm text-[#d1c5c7] mb-6">
+                    {liveInfo.platform === 'youtube' ? 'YouTubeにて配信中！遊びにきてね！' : 'TwitCastingにて配信中！遊びにきてね！'}
+                  </p>
                   
                   <motion.a 
                     href={liveInfo.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}
-                    className="inline-flex bg-red-400 hover:bg-red-50 text-white font-bold py-3 px-8 rounded-full text-xs tracking-widest shadow-lg transition-colors items-center gap-2 mx-auto md:mx-0"
+                    className={`inline-flex ${liveInfo.platform === 'youtube' ? 'bg-red-500 hover:bg-red-400' : 'bg-sky-500 hover:bg-sky-400'} text-white font-bold py-3 px-8 rounded-full text-xs tracking-widest shadow-lg transition-colors items-center gap-2 mx-auto md:mx-0`}
                     onHoverStart={() => setIsHoveringLink(true)}
                     onHoverEnd={() => setIsHoveringLink(false)}
                   >
-                    <TbBroadcast className="text-lg" />
+                    {liveInfo.platform === 'youtube' ? <FaYoutube className="text-lg" /> : <TbBroadcast className="text-lg" />}
                     配信を見に行く
                   </motion.a>
                 </div>
               </div>
             </section>
           )}
+          {/* ▲▲▲ ハイブリッドバナーここまで ▲▲▲ */}
 
           <motion.section 
             id="profile"
