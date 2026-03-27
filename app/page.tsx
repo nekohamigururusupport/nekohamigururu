@@ -495,9 +495,9 @@ export default function Home() {
               <div className="hidden md:flex items-center justify-start mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] whitespace-nowrap w-full">
                 <span className="text-[28px] lg:text-[40px]">手懐けられないわがまま猫な</span>
                 <span className="flex flex-row items-center mx-3 whitespace-nowrap">
-                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛</span>
                   <span className="text-[28px] lg:text-[40px] mx-3">新人Vtuber</span>
-                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛⛓️</span>
+                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
 
