@@ -534,11 +534,23 @@ export default function Home() {
               }}
             >
               <motion.div 
-                className="w-64 h-64 md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] bg-[#544b4d] border border-white/10 rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group transition-all"
+                className="relative h-64 md:h-[450px] lg:h-[550px] aspect-square bg-[#544b4d] border border-white/10 rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group transition-all"
                 style={{ rotateX: tiltRotateX, rotateY: tiltRotateY }}
               >
+                <div
+                  className="absolute inset-0 z-30 rounded-[4rem] pointer-events-none transition-opacity duration-100"
+                  style={{
+                    opacity: 1,
+                    border: '0.75px solid rgba(138, 24, 24, 0.95)',
+                    boxShadow: 'inset 0 0 10px rgba(74, 12, 12, 0.9), 0 0 14px rgba(127, 29, 29, 0.95), 0 0 36px rgba(153, 27, 27, 0.95), 0 0 72px rgba(185, 28, 28, 0.85)'
+                  }}
+                />
                 <span className="text-white/10 text-9xl absolute -bottom-8 -right-8 rotate-12 group-hover:rotate-0 transition-transform duration-700 drop-shadow-lg pointer-events-none">🦴</span>
-                <p className="text-[#a89c9e] text-xs italic tracking-widest pointer-events-none">CHARACTER VIEW</p>
+                <img
+                  src="/img/fv1.jpg"
+                  alt="猫喰ぐるる"
+                  className="w-full h-full object-cover object-top scale-150 origin-top"
+                />
               </motion.div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-red-400/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
             </div>
