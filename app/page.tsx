@@ -103,6 +103,63 @@ const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotat
   </motion.div>
 );
 
+const menuPawParticles = [
+  { left: '18%', rotateFrom: 45, rotateTo: 180 },
+  { left: '32%', rotateFrom: 120, rotateTo: 320 },
+  { left: '48%', rotateFrom: 200, rotateTo: 90 },
+  { left: '62%', rotateFrom: 15, rotateTo: 270 },
+  { left: '78%', rotateFrom: 310, rotateTo: 140 },
+  { left: '25%', rotateFrom: 80, rotateTo: 400 },
+  { left: '55%', rotateFrom: 160, rotateTo: 20 },
+  { left: '70%', rotateFrom: 240, rotateTo: 500 },
+  { left: '40%', rotateFrom: 30, rotateTo: 220 },
+  { left: '85%', rotateFrom: 190, rotateTo: 360 },
+];
+
+const ContactTapHint = ({ hidden }: { hidden: boolean }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const hintBoxClass =
+    'rounded-3xl bg-red-500/18 border-2 border-red-400/55 backdrop-blur-md shadow-[0_0_28px_rgba(248,113,113,0.5)]';
+
+  return (
+    <AnimatePresence>
+      {!hidden && (
+        <motion.div
+          className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[calc(100%+2.7rem)] pointer-events-none select-none z-[35] hidden md:block"
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -8 }}
+          transition={{ duration: 0.35 }}
+        >
+          <motion.div
+            className={`flex items-center gap-4 px-7 py-4 ${hintBoxClass}`}
+            animate={{ opacity: [0.85, 1, 0.85], x: [0, 11, 0] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <span className="text-[1.8rem] lg:text-[2rem] font-bold tracking-[0.14em] text-[#ffe8ec] drop-shadow-[0_0_10px_rgba(255,200,210,0.65)] whitespace-nowrap">
+              タップ
+            </span>
+            <motion.span
+              className="text-[2rem] lg:text-4xl text-red-400 drop-shadow-[0_0_16px_rgba(248,113,113,0.9)] leading-none"
+              animate={{ x: [0, 9, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              ☞
+            </motion.span>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -440,15 +497,15 @@ export default function Home() {
                 className="fixed top-16 left-0 w-full bg-[#3a3335]/95 backdrop-blur-md border-b border-white/10 flex flex-col items-center py-4 gap-3 md:hidden z-[55] shadow-xl overflow-hidden"
               >
                 <div className="absolute inset-0 z-0 pointer-events-none">
-                  {[...Array(10)].map((_, i) => (
+                  {menuPawParticles.map((p, i) => (
                     <motion.div
                       key={i}
                       className="absolute w-5 h-5 text-[#ffdce3] opacity-60 drop-shadow-[0_0_8px_rgba(255,220,227,0.4)]"
-                      style={{ left: `${Math.random() * 80 + 10}%`, top: `-10%` }}
-                      animate={{ 
+                      style={{ left: p.left, top: '-10%' }}
+                      animate={{
                         y: ['0vh', '100vh'],
                         opacity: [0, 0.6, 0.6, 0],
-                        rotate: [Math.random() * 360, Math.random() * 360 * 2] 
+                        rotate: [p.rotateFrom, p.rotateTo],
                       }}
                       transition={{ 
                         delay: i * 0.3, 
@@ -852,18 +909,20 @@ export default function Home() {
 
           <motion.section 
             id="contact" 
-            className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block"
+            className="px-6 md:pl-40 md:pr-24 lg:pl-48 lg:pr-40 py-10 md:py-12 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block overflow-visible"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
             <motion.div 
-              className="relative w-full min-h-[60vh] cursor-pointer group"
+              className="relative w-full min-h-[60vh] cursor-pointer group overflow-visible"
               onClick={handleCutTicket}
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
+              <ContactTapHint hidden={isTicketCut} />
+
               <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
               <motion.div 
@@ -912,6 +971,7 @@ export default function Home() {
                     href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     whileHover={{ scale: 1.05 }}
                     className="flex items-center justify-center gap-4 py-6 px-16 bg-red-400 text-white text-lg lg:text-xl font-bold tracking-wide rounded-full shadow-lg group-hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] group-hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40"
                     onHoverStart={() => setIsHoveringLink(true)}
@@ -928,14 +988,14 @@ export default function Home() {
 
           <motion.section 
             id="contact-mobile" 
-            className="px-6 mb-16 max-w-md mx-auto scroll-mt-24 relative md:hidden"
+            className="px-6 pb-10 mb-16 max-w-md mx-auto scroll-mt-24 relative md:hidden overflow-visible"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
             <motion.div 
-              className="relative w-full min-h-[50vh] cursor-pointer group"
+              className="relative w-full min-h-[50vh] cursor-pointer group overflow-visible"
               onClick={handleCutTicket}
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
@@ -990,6 +1050,7 @@ export default function Home() {
                     href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     whileHover={{ scale: 1.05 }}
                     className="flex items-center justify-center gap-4 py-5 px-12 bg-red-400 text-white text-base font-bold tracking-wide rounded-full shadow-lg hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40 mx-auto"
                     onHoverStart={() => setIsHoveringLink(true)}
