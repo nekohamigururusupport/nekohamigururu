@@ -11,7 +11,7 @@ const roundedFont = M_PLUS_Rounded_1c({
 
 export const metadata: Metadata = {
   title: "猫喰ぐるる🐾 公式サイト",
-  description: "新人VTuber 猫喰ぐるる（Nekohami Gururu）の公式サイト。ゲーム実況や歌ってみたを中心に気まぐれ配信中！🐈‍⬛⛓️",
+  description: "新人VTuberを目指す猫喰ぐるる（Nekohami Gururu）の公式サイト。ゲーム実況や歌ってみたを中心に気まぐれ配信中！🐈‍⬛⛓️",
   
   robots: {
     index: false,
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "猫喰ぐるる🐾 公式サイト",
-    description: "ポップな可愛さの裏に鋭いこだわりを隠し持つ新人Vチューバー！",
+    description: "ポップな可愛さの裏に鋭いこだわりを隠し持つ、新人Vチューバーを目指す！",
     url: "https://nekohami-gururu.com",
     siteName: "猫喰ぐるる 公式サイト",
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "猫喰ぐるる🐾 公式サイト",
-    description: "ポップな可愛さの裏に鋭いこだわりを隠し持つ新人Vチューバー！",
+    description: "ポップな可愛さの裏に鋭いこだわりを隠し持つ、新人Vチューバーを目指す！",
     creator: "@h_neko20", 
     images: ["https://nekohami-gururu.com/ogp.png"],
   },

@@ -479,7 +479,7 @@ export default function Home() {
           <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-28 md:pt-16 lg:mb-32 relative scroll-mt-24 gap-12 md:gap-0">
             <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-10 flex flex-col items-center md:items-start">
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
-                新人Vtuber
+                新人Vtuberを目指す
               </div>
               <h1 className="text-[38px] md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight whitespace-nowrap ml-[10px] md:ml-[20px]">
                 猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
@@ -496,7 +496,7 @@ export default function Home() {
                 <span className="text-[28px] lg:text-[40px]">手懐けられないわがまま猫な</span>
                 <span className="flex flex-row items-center mx-3 whitespace-nowrap">
                   <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛</span>
-                  <span className="text-[28px] lg:text-[40px] mx-3">新人Vtuber</span>
+                  <span className="text-[28px] lg:text-[40px] mx-3">新人配信者</span>
                   <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
@@ -508,7 +508,7 @@ export default function Home() {
                 <span className="text-[17px] sm:text-[20px] whitespace-nowrap">手懐けられないわがまま猫な</span>
                 <span className="flex flex-row items-center mt-2 whitespace-nowrap">
                   <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛</span>
-                  <span className="text-[22px] sm:text-[24px] mx-2">新人Vtuber</span>
+                  <span className="text-[22px] sm:text-[24px] mx-2">新人配信者</span>
                   <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
@@ -614,7 +614,7 @@ export default function Home() {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 lg:gap-10 items-center w-full">
                 <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16px] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
-                  <p>猫喰ぐるる（Nekohami Gururu）<br className="hidden md:inline" />ポップな可愛さの裏に魚の骨のような<br className="hidden md:inline" />鋭いこだわりを隠し持つ<br className="hidden md:inline" />新人Vチューバー</p>
+                  <p>猫喰ぐるる（Nekohami Gururu）<br className="hidden md:inline" />ポップな可愛さの裏に魚の骨のような<br className="hidden md:inline" />鋭いこだわりを隠し持つ、<br className="hidden md:inline" />新人Vチューバーを目指している</p>
                   <p>ゲーム実況や歌ってみたを中心に<br className="hidden md:inline" />リスナーの皆と楽しい<br className="hidden md:inline" />空間を作っていくよ！</p>
                 </div>
                 <div className="bg-[#453e40] p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-white/5 space-y-4 md:space-y-8 shadow-inner w-full">
