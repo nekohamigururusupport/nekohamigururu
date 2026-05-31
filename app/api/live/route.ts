@@ -1,6 +1,16 @@
 // app/api/live/route.ts
 import { NextResponse } from 'next/server';
 
+const normalizeThumbnailUrl = (url?: string) => url?.replace(/^http:\/\//i, 'https://') || '';
+
+const pickTwitcastingThumbnail = (movie: {
+  large_thumbnail?: string;
+  small_thumbnail?: string;
+}) =>
+  normalizeThumbnailUrl(movie.large_thumbnail) ||
+  normalizeThumbnailUrl(movie.small_thumbnail) ||
+  '/api/live/thumbnail';
+
 export async function GET() {
   // ① 鍵の準備
   const tcClientId = process.env.TWITCASTING_CLIENT_ID;
@@ -63,7 +73,7 @@ export async function GET() {
             platform: 'twitcasting',
             title: tcData.movie.title || 'ゲリラ配信中🐾',
             url: `https://twitcasting.tv/${tcUserId}`,
-            thumbnail: '', // ツイキャスはデフォルトサムネで対応
+            thumbnail: pickTwitcastingThumbnail(tcData.movie),
           };
           return NextResponse.json(liveData);
         }

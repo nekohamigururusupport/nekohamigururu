@@ -234,6 +234,50 @@ const ContactTapHint = ({ hidden }: { hidden: boolean }) => {
   );
 };
 
+const TWITCASTING_SCREEN_ID = 'h_neko20';
+
+const LiveStreamThumbnail = ({ primarySrc }: { primarySrc: string }) => {
+  const [src, setSrc] = useState(primarySrc);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setSrc(primarySrc);
+    setFailed(false);
+  }, [primarySrc]);
+
+  const fallbacks = [
+    primarySrc,
+    primarySrc.includes('/api/live/thumbnail') ? null : `/api/live/thumbnail`,
+    `https://twitcasting.tv/api/live/thumbnail.php?user=${TWITCASTING_SCREEN_ID}&size=large`,
+  ].filter(Boolean) as string[];
+
+  if (failed) {
+    return (
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-[#a89c9e]">
+        <FaPaw className="text-red-400/25 text-5xl md:text-6xl" />
+        <span className="text-xs tracking-widest">配信中🐾</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt="配信サムネイル"
+      className="absolute inset-0 w-full h-full object-cover object-center"
+      onError={() => {
+        const currentIndex = fallbacks.indexOf(src);
+        const next = fallbacks[currentIndex + 1];
+        if (next) {
+          setSrc(next);
+          return;
+        }
+        setFailed(true);
+      }}
+    />
+  );
+};
+
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -607,7 +651,7 @@ export default function Home() {
             )}
           </AnimatePresence>
 
-          <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-28 md:pt-16 lg:mb-32 relative scroll-mt-24 gap-12 md:gap-0">
+          <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-28 md:pt-16 mb-32 lg:mb-48 relative scroll-mt-24 gap-12 md:gap-0">
             <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-10 flex flex-col items-center md:items-start">
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
                 Vtuberを目指す
@@ -689,41 +733,80 @@ export default function Home() {
 
           {/* ▼▼▼ YouTubeとツイキャスでデザインが変わるハイブリッドバナー ▼▼▼ */}
           {liveInfo.isLive && (
-            <section className="px-6 md:px-24 lg:px-40 mb-12 max-w-7xl mx-auto scroll-mt-24 relative overflow-hidden">
-              <div className="absolute inset-0 bg-white/5 opacity-5 z-0 rounded-[2rem]"></div>
-              <div className={`bg-gradient-to-r ${liveInfo.platform === 'youtube' ? 'from-red-600/20' : 'from-sky-500/15'} to-[#544b4d]/90 border ${liveInfo.platform === 'youtube' ? 'border-red-500/30' : 'border-sky-400/30'} rounded-[2rem] p-6 lg:p-8 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_20px_rgba(248,113,113,0.1)] relative overflow-hidden z-10`}>
-                <div className={`absolute -right-10 top-0 ${liveInfo.platform === 'youtube' ? 'text-red-500/5' : 'text-sky-500/5'} text-9xl rotate-12`}>🐾</div>
-                
-                {/* サムネイル部分 */}
-                <div className="w-full md:w-72 aspect-video bg-[#3a3335] rounded-2xl flex items-center justify-center text-sm text-gray-500 shadow-inner border border-white/5 overflow-hidden">
-                  {liveInfo.thumbnail ? (
-                    <img src={liveInfo.thumbnail} alt="配信サムネイル" className="w-full h-full object-cover" />
-                  ) : (
-                    <span>配信サムネイル🐾</span>
-                  )}
-                </div>
+            <section className="px-6 md:px-16 lg:px-24 mb-32 lg:mb-48 max-w-[min(100%,88rem)] mx-auto scroll-mt-24">
+              <div
+                className={`rounded-[2.5rem] md:rounded-[4rem] border backdrop-blur-md min-h-[60vh] p-6 md:p-8 lg:p-12 relative overflow-hidden bg-[#544b4d]/75 ${
+                  liveInfo.platform === 'youtube'
+                    ? 'border-red-400/30 shadow-[0_0_35px_rgba(248,113,113,0.12)]'
+                    : 'border-sky-400/30 shadow-[0_0_35px_rgba(56,189,248,0.12)]'
+                }`}
+              >
+                <div
+                  className={`absolute inset-0 pointer-events-none ${
+                    liveInfo.platform === 'youtube'
+                      ? 'bg-gradient-to-br from-red-500/15 via-red-400/8 to-transparent'
+                      : 'bg-gradient-to-br from-sky-500/15 via-sky-400/8 to-transparent'
+                  }`}
+                />
+                <div
+                  className={`absolute -left-20 top-1/2 -translate-y-1/2 w-56 h-56 rounded-full blur-3xl pointer-events-none ${
+                    liveInfo.platform === 'youtube' ? 'bg-red-400/10' : 'bg-sky-400/10'
+                  }`}
+                />
+                <div
+                  className={`absolute -right-10 bottom-0 w-40 h-40 rounded-full blur-3xl pointer-events-none ${
+                    liveInfo.platform === 'youtube' ? 'bg-red-300/8' : 'bg-sky-300/8'
+                  }`}
+                />
+                <div className="absolute top-8 right-10 text-8xl opacity-[0.03] rotate-12 pointer-events-none">🐾</div>
 
-                <div className="flex-1 text-center md:text-left">
-                  <div className="inline-block bg-red-500 text-white text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">
-                    🔴 NOW LIVE
+                <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-center gap-8 lg:gap-14 min-h-[calc(60vh-3rem)] md:min-h-[calc(60vh-4rem)] lg:justify-start">
+                  <div className="relative w-full lg:w-[min(62%,44rem)] aspect-[16/9] shrink-0 rounded-[2rem] md:rounded-[2.5rem] bg-[#453e40]/70 border border-white/10 overflow-hidden shadow-inner">
+                    {liveInfo.thumbnail ? (
+                      <LiveStreamThumbnail primarySrc={liveInfo.thumbnail} />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <FaPaw className={`text-5xl ${liveInfo.platform === 'youtube' ? 'text-red-400/20' : 'text-sky-400/20'}`} />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#453e40]/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute top-4 left-4 inline-flex items-center gap-2 text-[10px] font-black tracking-widest px-3 py-1.5 rounded-full backdrop-blur-md border animate-pulse bg-red-500/20 border-red-400/40 text-red-200 shadow-[0_0_14px_rgba(248,113,113,0.35)]">
+                      🔴 NOW LIVE
+                    </div>
                   </div>
-                  <h3 className="text-xl lg:text-2xl font-bold text-[#f4ebeb] mb-2 tracking-wide line-clamp-2">{liveInfo.title}</h3>
-                  <p className="text-sm text-[#d1c5c7] mb-6">
-                    {liveInfo.platform === 'youtube' ? 'YouTubeにて配信中！遊びにきてね！' : 'TwitCastingにて配信中！遊びにきてね！'}
-                  </p>
-                  
-                  <motion.a 
-                    href={liveInfo.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.05 }}
-                    className={`inline-flex ${liveInfo.platform === 'youtube' ? 'bg-red-500 hover:bg-red-400' : 'bg-sky-500 hover:bg-sky-400'} text-white font-bold py-3 px-8 rounded-full text-xs tracking-widest shadow-lg transition-colors items-center gap-2 mx-auto md:mx-0`}
-                    onHoverStart={() => setIsHoveringLink(true)}
-                    onHoverEnd={() => setIsHoveringLink(false)}
-                  >
-                    {liveInfo.platform === 'youtube' ? <FaYoutube className="text-lg" /> : <TbBroadcast className="text-lg" />}
-                    配信を見に行く
-                  </motion.a>
+
+                  <div className="flex flex-col items-center lg:items-start justify-center text-center lg:text-left py-2 lg:py-6 flex-1 lg:min-w-[18rem] xl:min-w-[22rem]">
+                    <p
+                      className={`text-[10px] md:text-xs font-black tracking-[0.35em] mb-4 uppercase drop-shadow-[0_0_8px_rgba(255,255,255,0.15)] ${
+                        liveInfo.platform === 'youtube' ? 'text-red-300/80' : 'text-sky-200/80'
+                      }`}
+                    >
+                      {liveInfo.platform === 'youtube' ? 'YouTube Live' : 'TwitCasting Live'}
+                    </p>
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-[#f4ebeb] mb-5 tracking-wide line-clamp-3 drop-shadow-[0_0_10px_rgba(255,255,255,0.08)]">
+                      {liveInfo.title}
+                    </h3>
+                    <p className="text-sm md:text-base text-[#d1c5c7] mb-8 max-w-md leading-relaxed font-bold">
+                      {liveInfo.platform === 'youtube' ? 'YouTubeにて配信中！遊びにきてね！' : 'TwitCastingにて配信中！遊びにきてね！'}
+                    </p>
+
+                    <motion.a
+                      href={liveInfo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.04 }}
+                      className={`inline-flex font-bold py-3.5 px-9 rounded-full text-xs md:text-sm tracking-widest transition-all items-center gap-2.5 backdrop-blur-md border ${
+                        liveInfo.platform === 'youtube'
+                          ? 'bg-red-500/25 border-red-400/45 text-red-100 hover:bg-red-500/35 shadow-[0_0_22px_rgba(248,113,113,0.28)] hover:shadow-[0_0_28px_rgba(248,113,113,0.4)]'
+                          : 'bg-sky-500/25 border-sky-400/45 text-sky-50 hover:bg-sky-500/35 shadow-[0_0_22px_rgba(56,189,248,0.28)] hover:shadow-[0_0_28px_rgba(56,189,248,0.4)]'
+                      }`}
+                      onHoverStart={() => setIsHoveringLink(true)}
+                      onHoverEnd={() => setIsHoveringLink(false)}
+                    >
+                      {liveInfo.platform === 'youtube' ? <FaYoutube className="text-lg" /> : <TbBroadcast className="text-lg" />}
+                      配信を見に行く
+                    </motion.a>
+                  </div>
                 </div>
               </div>
             </section>
@@ -732,7 +815,7 @@ export default function Home() {
 
           <motion.section 
             id="profile"
-            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-7xl mx-auto scroll-mt-24"
+            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto scroll-mt-24"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -757,7 +840,7 @@ export default function Home() {
             </div>
           </motion.section>
 
-          <section className="py-16 lg:py-24 px-6 relative">
+          <section className="py-20 lg:py-28 px-6 mb-32 lg:mb-48 relative">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto z-10 relative">
               {snsLinks.map((sns) => (
                 <a 
@@ -778,7 +861,7 @@ export default function Home() {
 
           <motion.section 
             id="tags"
-            className="px-6 md:px-24 mb-32 lg:mb-64 max-w-5xl mx-auto scroll-mt-24"
+            className="px-6 md:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto scroll-mt-24"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -810,7 +893,7 @@ export default function Home() {
 
           <motion.section 
             id="music"
-            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-7xl mx-auto scroll-mt-24"
+            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto scroll-mt-24"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -840,7 +923,7 @@ export default function Home() {
 
           <motion.section 
             id="message"
-            className="px-6 md:px-24 lg:px-40 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative"
+            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-6xl mx-auto scroll-mt-24 relative"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -894,7 +977,7 @@ export default function Home() {
             </div>
           </motion.section>
 
-          <section className="py-12 lg:py-24 px-6 border-b border-white/5 mb-32 lg:mb-64">
+          <section className="py-16 lg:py-28 px-6 border-b border-white/5 mb-32 lg:mb-48">
             <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto">
               {snsLinks.map((sns) => (
                 <a 
@@ -913,7 +996,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="schedule" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-64 max-w-7xl mx-auto flex flex-col items-center scroll-mt-24">
+          <section id="schedule" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto flex flex-col items-center scroll-mt-24">
             <div className="text-center mb-8 relative hidden md:block">
               <h2 className="text-3xl lg:text-5xl font-black text-red-300 tracking-[0.2em] drop-shadow-[0_0_8px_rgba(248,113,113,0.4)] flex items-center justify-center gap-2">
                 気まぐれ
@@ -983,7 +1066,7 @@ export default function Home() {
 
           <motion.section 
             id="contact" 
-            className="px-6 md:pl-40 md:pr-24 lg:pl-48 lg:pr-40 py-10 md:py-12 mb-16 lg:mb-32 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block overflow-visible"
+            className="px-6 md:pl-40 md:pr-24 lg:pl-48 lg:pr-40 py-10 md:py-12 mb-32 lg:mb-48 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block overflow-visible"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -1062,7 +1145,7 @@ export default function Home() {
 
           <motion.section 
             id="contact-mobile" 
-            className="px-6 pb-10 mb-16 max-w-md mx-auto scroll-mt-24 relative md:hidden overflow-visible"
+            className="px-6 pb-10 mb-32 lg:mb-48 max-w-md mx-auto scroll-mt-24 relative md:hidden overflow-visible"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -1139,7 +1222,7 @@ export default function Home() {
             </motion.div>
           </motion.section>
 
-          <section className="px-6 md:px-24 mb-32 max-w-5xl mx-auto text-center border-t border-white/10 pt-20 relative z-10 scroll-mt-24">
+          <section className="px-6 md:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto text-center border-t border-white/10 pt-20 relative z-10 scroll-mt-24">
             <h2 className="text-sm lg:text-base font-bold text-[#c2b6b8] mb-6 tracking-widest">二次創作・ガイドラインについて</h2>
             <p className="text-xs lg:text-sm text-[#a89c9e] leading-relaxed max-w-3xl mx-auto font-medium">
               ファンアートや切り抜き動画の制作は原則大歓迎です！制作の際は、他の方の迷惑にならない範囲で、愛を持って楽しんでいただけると嬉しいです。（※センシティブな内容や、公式と誤認されるような表現はお控えください）
