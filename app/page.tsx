@@ -25,9 +25,6 @@ const PreReleaseSiteTitle = ({
       ? 'text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.08em] md:tracking-[0.12em]'
       : 'text-[1.35rem] sm:text-3xl md:text-5xl lg:text-7xl tracking-[0.06em] sm:tracking-[0.1em] md:tracking-[0.15em]';
 
-  const leadParts = preReleaseTitleParts.slice(0, 3);
-  const suffixPart = preReleaseTitleParts[3];
-
   const renderPart = (part: (typeof preReleaseTitleParts)[number], index: number) => {
     const className = `${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`;
 
@@ -52,15 +49,27 @@ const PreReleaseSiteTitle = ({
     );
   };
 
+  if (variant === 'splash') {
+    return (
+      <h1
+        className={`font-black leading-tight text-center flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1 max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
+      >
+        {preReleaseTitleParts.map((part, i) => renderPart(part, i))}
+      </h1>
+    );
+  }
+
+  const leadParts = preReleaseTitleParts.slice(0, 3);
+  const suffixPart = preReleaseTitleParts[3];
+
   return (
     <h1
-      className={`font-black leading-tight text-center max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
+      className={`font-black leading-tight flex flex-col items-center justify-center w-full max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
     >
       <span className="inline-flex items-baseline justify-center gap-x-1 sm:gap-x-2 whitespace-nowrap">
         {leadParts.map((part, i) => renderPart(part, i))}
       </span>
-      <br />
-      {renderPart(suffixPart, 3)}
+      <span className="block text-center">{renderPart(suffixPart, 3)}</span>
     </h1>
   );
 };
@@ -112,7 +121,7 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
         <SplashNeonPaw key={i} top={p.top} left={p.left} rotate={p.rotate} delay={p.delay} scale={p.scale} />
       ))}
 
-      <div className="relative z-10 px-4">
+      <div className="relative z-10 px-4 flex justify-center w-full">
         {showName ? (
           <div className="flex gap-1 md:gap-2">
             {chars.map((char, i) => (
