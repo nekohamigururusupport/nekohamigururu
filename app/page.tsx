@@ -25,30 +25,42 @@ const PreReleaseSiteTitle = ({
       ? 'text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.08em] md:tracking-[0.12em]'
       : 'text-[1.35rem] sm:text-3xl md:text-5xl lg:text-7xl tracking-[0.06em] sm:tracking-[0.1em] md:tracking-[0.15em]';
 
+  const leadParts = preReleaseTitleParts.slice(0, 3);
+  const suffixPart = preReleaseTitleParts[3];
+
+  const renderPart = (part: (typeof preReleaseTitleParts)[number], index: number) => {
+    const className = `${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`;
+
+    if (animated) {
+      return (
+        <motion.span
+          key={part.text}
+          className={className}
+          initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }}
+          animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+          transition={{ delay: 0.5 + index * 0.15, duration: 0.6, type: 'spring', stiffness: 100 }}
+        >
+          {part.text}
+        </motion.span>
+      );
+    }
+
+    return (
+      <span key={part.text} className={className}>
+        {part.text}
+      </span>
+    );
+  };
+
   return (
     <h1
-      className={`font-black leading-tight text-center flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1 max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
+      className={`font-black leading-tight text-center max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
     >
-      {preReleaseTitleParts.map((part, i) =>
-        animated ? (
-          <motion.span
-            key={part.text}
-            className={`${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`}
-            initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-            transition={{ delay: 0.5 + i * 0.15, duration: 0.6, type: 'spring', stiffness: 100 }}
-          >
-            {part.text}
-          </motion.span>
-        ) : (
-          <span
-            key={part.text}
-            className={`${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`}
-          >
-            {part.text}
-          </span>
-        )
-      )}
+      <span className="inline-flex items-baseline justify-center gap-x-1 sm:gap-x-2 whitespace-nowrap">
+        {leadParts.map((part, i) => renderPart(part, i))}
+      </span>
+      <br />
+      {renderPart(suffixPart, 3)}
     </h1>
   );
 };
@@ -100,9 +112,10 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
         <SplashNeonPaw key={i} top={p.top} left={p.left} rotate={p.rotate} delay={p.delay} scale={p.scale} />
       ))}
 
-      <div className="flex gap-1 md:gap-2 relative z-10">
+      <div className="relative z-10 px-4">
         {showName ? (
-          chars.map((char, i) => (
+          <div className="flex gap-1 md:gap-2">
+            {chars.map((char, i) => (
             <motion.span
               key={i}
               className={`text-5xl md:text-7xl lg:text-8xl font-black ${
@@ -120,7 +133,8 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
             >
               {char}
             </motion.span>
-          ))
+            ))}
+          </div>
         ) : (
           <PreReleaseSiteTitle variant="splash" animated />
         )}
@@ -587,7 +601,7 @@ export default function Home() {
           <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-28 md:pt-16 lg:mb-32 relative scroll-mt-24 gap-12 md:gap-0">
             <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-10 flex flex-col items-center md:items-start">
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
-                新人Vtuberを目指す
+                Vtuberを目指す
               </div>
               <h1 className="text-[38px] md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight whitespace-nowrap ml-[10px] md:ml-[20px]">
                 猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
