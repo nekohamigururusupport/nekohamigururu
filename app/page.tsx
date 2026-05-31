@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
+import { isSiteReleased } from '@/lib/site-release';
 
 // 🐾 オープニング用：ネオンガラス肉球の花火エフェクトパーツ
 const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left: string, rotate: string, delay: number, scale: string }) => (
@@ -23,8 +24,8 @@ const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left:
   </motion.div>
 );
 
-// 🐾 オープニング画面コンポーネント
-const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
+// 🐾 オープニング画面コンポーネント（公開後のみ名前表示）
+const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showName: boolean }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
@@ -53,26 +54,43 @@ const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
       ))}
 
       <div className="flex gap-1 md:gap-2 relative z-10">
-        {chars.map((char, i) => (
-          <motion.span
-            key={i}
-            className={`text-5xl md:text-7xl lg:text-8xl font-black ${
-              i < 2 
-                ? 'text-[#f4ebeb]' 
-                : 'text-red-400' 
-            }`}
-            style={{ 
-              filter: i < 2 
-                ? "drop-shadow(0 0 8px rgba(244,114,182,0.2))" 
-                : "drop-shadow(0 0 5px #f472b6) drop-shadow(0 0 15px #f472b6)" 
-            }}
-            initial={{ opacity: 0, x: -50, filter: "blur(10px)" }}
-            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-            transition={{ delay: 0.5 + i * 0.12, duration: 0.6, type: "spring", stiffness: 100 }}
+        {showName ? (
+          chars.map((char, i) => (
+            <motion.span
+              key={i}
+              className={`text-5xl md:text-7xl lg:text-8xl font-black ${
+                i < 2 ? 'text-[#f4ebeb]' : 'text-red-400'
+              }`}
+              style={{
+                filter:
+                  i < 2
+                    ? 'drop-shadow(0 0 8px rgba(244,114,182,0.2))'
+                    : 'drop-shadow(0 0 5px #f472b6) drop-shadow(0 0 15px #f472b6)',
+              }}
+              initial={{ opacity: 0, x: -50, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+              transition={{ delay: 0.5 + i * 0.12, duration: 0.6, type: 'spring', stiffness: 100 }}
+            >
+              {char}
+            </motion.span>
+          ))
+        ) : (
+          <motion.div
+            className="flex items-center gap-3 md:gap-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.6, type: 'spring', stiffness: 100 }}
           >
-            {char}
-          </motion.span>
-        ))}
+            {[0, 1, 2, 3, 4].map((i) => (
+              <motion.div
+                key={i}
+                className="w-3 md:w-4 h-10 md:h-14 rounded-full bg-red-400/20 border border-red-400/50 backdrop-blur-md"
+                animate={{ opacity: [0.4, 0.8, 0.4], y: [0, -6, 0] }}
+                transition={{ delay: 0.6 + i * 0.1, duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            ))}
+          </motion.div>
+        )}
       </div>
     </motion.div>
   );
@@ -336,59 +354,65 @@ export default function Home() {
   };
 
   // ==========================================
-  // ✅ 対策2：公開フラグ（魔法の1行！）
+  // 公開フラグ — デビュー時: NEXT_PUBLIC_SITE_RELEASED=true（本番）
   // ==========================================
-  const isReleased = process.env.NODE_ENV === 'development'; 
+  const isReleased = isSiteReleased();
 
   if (!isReleased) {
     return (
-      <>
-        <AnimatePresence>
-          {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-        </AnimatePresence>
+      <main className="min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-0"></div>
+        <GlassPawBG className="w-64 h-64 top-[10%] left-[10%] rotate-12" />
+        <GlassPawBG className="w-40 h-40 bottom-[20%] right-[10%] -rotate-45" />
 
-        {!showSplash && (
-          <main className="min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 flex flex-col items-center justify-center relative overflow-hidden">
-            <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-0"></div>
-            <GlassPawBG className="w-64 h-64 top-[10%] left-[10%] rotate-12" />
-            <GlassPawBG className="w-40 h-40 bottom-[20%] right-[10%] -rotate-45" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          className="relative z-10 flex flex-col items-center gap-8 p-6 text-center"
+        >
+          <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-2 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className="relative z-10 flex flex-col items-center gap-8 p-6 text-center"
+          {/* 名前非公開 — シルエットのみ */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-end justify-center gap-2 md:gap-3">
+              {[14, 20, 16, 16, 16].map((h, i) => (
+                <motion.div
+                  key={i}
+                  className="w-8 md:w-12 rounded-full bg-gradient-to-b from-red-400/30 to-red-500/5 border border-red-400/45 backdrop-blur-md shadow-[0_0_24px_rgba(248,113,113,0.12)]"
+                  style={{ height: `${h * 4}px` }}
+                  animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -5, 0] }}
+                  transition={{ delay: i * 0.12, duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              ))}
+            </div>
+            <p className="text-[#a89c9e] text-[10px] md:text-xs font-bold tracking-[0.45em] uppercase">
+              identity classified
+            </p>
+            <p className="text-2xl md:text-3xl tracking-widest">🐈‍⬛ ⛓️</p>
+          </div>
+
+          <div className="w-24 h-[2px] bg-red-400/50 rounded-full"></div>
+
+          <p className="text-2xl md:text-4xl text-red-300 font-black tracking-[0.3em] md:tracking-[0.5em] drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]">
+            COMING SOON
+          </p>
+
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <p className="text-[#a89c9e] text-sm md:text-base font-bold tracking-[0.2em] border border-white/10 bg-white/5 px-6 py-2 rounded-full backdrop-blur-sm">
+              2026 DEBUT🐾
+            </p>
+            <a
+              href="https://x.com/h_neko20?s=21"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-300/80 hover:text-red-400 text-xs tracking-widest mt-4 flex items-center gap-2 transition-colors"
             >
-              <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-4 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
-              
-              <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[10px] md:tracking-[20px] whitespace-nowrap ml-[10px] md:ml-[20px]">
-                猫喰
-                <span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
-              </h1>
-              
-              <div className="w-24 h-[2px] bg-red-400/50 rounded-full mt-4"></div>
-              
-              <p className="text-2xl md:text-4xl text-red-300 font-black tracking-[0.3em] md:tracking-[0.5em] drop-shadow-[0_0_8px_rgba(248,113,113,0.6)] mt-2">
-                COMING SOON
-              </p>
-              
-              <div className="mt-8 flex flex-col items-center gap-2">
-                <p className="text-[#a89c9e] text-sm md:text-base font-bold tracking-[0.2em] border border-white/10 bg-white/5 px-6 py-2 rounded-full backdrop-blur-sm">
-                  2026 DEBUT🐾
-                </p>
-                <a 
-                  href="https://x.com/h_neko20?s=21" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-red-300/80 hover:text-red-400 text-xs tracking-widest mt-4 flex items-center gap-2 transition-colors"
-                >
-                  <FaXTwitter /> Official X をフォローして待っててね！
-                </a>
-              </div>
-            </motion.div>
-          </main>
-        )}
-      </>
+              <FaXTwitter /> Official X をフォローして待っててね！
+            </a>
+          </div>
+        </motion.div>
+      </main>
     );
   }
   // ==========================================
@@ -398,7 +422,7 @@ export default function Home() {
   return (
     <>
       <AnimatePresence>
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} showName={isReleased} />}
       </AnimatePresence>
 
       <motion.div
