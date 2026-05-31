@@ -6,6 +6,53 @@ import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 import { isSiteReleased } from '@/lib/site-release';
 
+const preReleaseTitleParts = [
+  { text: 'とある', className: 'text-[#f4ebeb]' },
+  { text: '新人配信者', className: 'text-[#f4ebeb]' },
+  { text: '🐾', className: 'text-red-400' },
+  { text: '公式サイト', className: 'text-red-400' },
+];
+
+const PreReleaseSiteTitle = ({
+  variant = 'fv',
+  animated = false,
+}: {
+  variant?: 'splash' | 'fv';
+  animated?: boolean;
+}) => {
+  const sizeClass =
+    variant === 'splash'
+      ? 'text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.08em] md:tracking-[0.12em]'
+      : 'text-[1.35rem] sm:text-3xl md:text-5xl lg:text-7xl tracking-[0.06em] sm:tracking-[0.1em] md:tracking-[0.15em]';
+
+  return (
+    <h1
+      className={`font-black leading-tight text-center flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1 max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
+    >
+      {preReleaseTitleParts.map((part, i) =>
+        animated ? (
+          <motion.span
+            key={part.text}
+            className={`${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`}
+            initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            transition={{ delay: 0.5 + i * 0.15, duration: 0.6, type: 'spring', stiffness: 100 }}
+          >
+            {part.text}
+          </motion.span>
+        ) : (
+          <span
+            key={part.text}
+            className={`${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`}
+          >
+            {part.text}
+          </span>
+        )
+      )}
+    </h1>
+  );
+};
+
 // 🐾 オープニング用：ネオンガラス肉球の花火エフェクトパーツ
 const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left: string, rotate: string, delay: number, scale: string }) => (
   <motion.div
@@ -75,21 +122,7 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
             </motion.span>
           ))
         ) : (
-          <motion.div
-            className="flex items-center gap-3 md:gap-4"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.6, type: 'spring', stiffness: 100 }}
-          >
-            {[0, 1, 2, 3, 4].map((i) => (
-              <motion.div
-                key={i}
-                className="w-3 md:w-4 h-10 md:h-14 rounded-full bg-red-400/20 border border-red-400/50 backdrop-blur-md"
-                animate={{ opacity: [0.4, 0.8, 0.4], y: [0, -6, 0] }}
-                transition={{ delay: 0.6 + i * 0.1, duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            ))}
-          </motion.div>
+          <PreReleaseSiteTitle variant="splash" animated />
         )}
       </div>
     </motion.div>
@@ -360,59 +393,53 @@ export default function Home() {
 
   if (!isReleased) {
     return (
-      <main className="min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-0"></div>
-        <GlassPawBG className="w-64 h-64 top-[10%] left-[10%] rotate-12" />
-        <GlassPawBG className="w-40 h-40 bottom-[20%] right-[10%] -rotate-45" />
+      <>
+        <AnimatePresence>
+          {showSplash && (
+            <SplashScreen onComplete={() => setShowSplash(false)} showName={false} />
+          )}
+        </AnimatePresence>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: 'easeOut' }}
-          className="relative z-10 flex flex-col items-center gap-8 p-6 text-center"
-        >
-          <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-2 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
+        {!showSplash && (
+          <main className="min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 flex flex-col items-center justify-center relative overflow-hidden">
+            <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-0"></div>
+            <GlassPawBG className="w-64 h-64 top-[10%] left-[10%] rotate-12" />
+            <GlassPawBG className="w-40 h-40 bottom-[20%] right-[10%] -rotate-45" />
 
-          {/* 名前非公開 — シルエットのみ */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex items-end justify-center gap-2 md:gap-3">
-              {[14, 20, 16, 16, 16].map((h, i) => (
-                <motion.div
-                  key={i}
-                  className="w-8 md:w-12 rounded-full bg-gradient-to-b from-red-400/30 to-red-500/5 border border-red-400/45 backdrop-blur-md shadow-[0_0_24px_rgba(248,113,113,0.12)]"
-                  style={{ height: `${h * 4}px` }}
-                  animate={{ opacity: [0.45, 0.9, 0.45], y: [0, -5, 0] }}
-                  transition={{ delay: i * 0.12, duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              ))}
-            </div>
-            <p className="text-[#a89c9e] text-[10px] md:text-xs font-bold tracking-[0.45em] uppercase">
-              identity classified
-            </p>
-            <p className="text-2xl md:text-3xl tracking-widest">🐈‍⬛ ⛓️</p>
-          </div>
-
-          <div className="w-24 h-[2px] bg-red-400/50 rounded-full"></div>
-
-          <p className="text-2xl md:text-4xl text-red-300 font-black tracking-[0.3em] md:tracking-[0.5em] drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]">
-            COMING SOON
-          </p>
-
-          <div className="mt-4 flex flex-col items-center gap-2">
-            <p className="text-[#a89c9e] text-sm md:text-base font-bold tracking-[0.2em] border border-white/10 bg-white/5 px-6 py-2 rounded-full backdrop-blur-sm">
-              2026 DEBUT🐾
-            </p>
-            <a
-              href="https://x.com/h_neko20?s=21"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-red-300/80 hover:text-red-400 text-xs tracking-widest mt-4 flex items-center gap-2 transition-colors"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              className="relative z-10 flex flex-col items-center gap-8 p-6 text-center"
             >
-              <FaXTwitter /> Official X をフォローして待っててね！
-            </a>
-          </div>
-        </motion.div>
-      </main>
+              <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-2 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
+
+              <PreReleaseSiteTitle variant="fv" />
+
+              <div className="w-24 h-[2px] bg-red-400/50 rounded-full"></div>
+
+              <p className="text-2xl md:text-4xl text-red-300 font-black tracking-[0.3em] md:tracking-[0.5em] drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]">
+                COMING SOON
+              </p>
+
+              <div className="mt-4 flex flex-col items-center gap-3">
+                <p className="text-[#a89c9e] text-sm md:text-base font-bold tracking-[0.2em] border border-white/10 bg-white/5 px-6 py-2 rounded-full backdrop-blur-sm">
+                  2026 DEBUT🐾
+                </p>
+                <a
+                  href="https://x.com/h_neko20?s=21"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-red-300 hover:text-red-200 text-sm md:text-base font-bold tracking-widest mt-2 flex items-center gap-2 transition-colors underline underline-offset-4 decoration-red-400/80 decoration-2 hover:decoration-red-300 drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]"
+                >
+                  <FaXTwitter className="text-base md:text-lg" />
+                  Official X をフォローして待っててね！
+                </a>
+              </div>
+            </motion.div>
+          </main>
+        )}
+      </>
     );
   }
   // ==========================================

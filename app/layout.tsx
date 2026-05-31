@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { M_PLUS_Rounded_1c } from "next/font/google";
-import { isSiteReleased } from "@/lib/site-release";
+import { isSiteReleased, PRE_RELEASE_SITE_TITLE } from "@/lib/site-release";
 import "./globals.css";
 
 const roundedFont = M_PLUS_Rounded_1c({
@@ -39,20 +39,20 @@ const releasedMetadata: Metadata = {
 };
 
 const preReleaseMetadata: Metadata = {
-  title: "COMING SOON 🐾",
+  title: PRE_RELEASE_SITE_TITLE,
   description: "2026 DEBUT — Official site opening soon.",
   robots: { index: false, follow: false },
   openGraph: {
-    title: "COMING SOON 🐾",
+    title: PRE_RELEASE_SITE_TITLE,
     description: "2026 DEBUT — Official site opening soon.",
     url: "https://nekohami-gururu.com",
-    siteName: "COMING SOON",
+    siteName: PRE_RELEASE_SITE_TITLE,
     images: [
       {
         url: "https://nekohami-gururu.com/ogp.png",
         width: 1200,
         height: 630,
-        alt: "COMING SOON",
+        alt: PRE_RELEASE_SITE_TITLE,
       },
     ],
     locale: "ja_JP",
@@ -60,7 +60,7 @@ const preReleaseMetadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "COMING SOON 🐾",
+    title: PRE_RELEASE_SITE_TITLE,
     description: "2026 DEBUT — Official site opening soon.",
     creator: "@h_neko20",
     images: ["https://nekohami-gururu.com/ogp.png"],
