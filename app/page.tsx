@@ -380,10 +380,10 @@ export default function Home() {
   }, []);
 
   const snsLinks = [
-    { n: 'X (Twitter)', url: 'https://x.com/h_neko20?s=21', icon: <FaXTwitter className="text-lg" />, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
-    { n: 'YouTube', url: 'https://youtube.com/channel/UC_u4f-7IHt12WxU05JNctIQ?si=bzIZIOaWskbPPSX2', icon: <FaYoutube className="text-lg" />, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
-    { n: 'TwitCasting', url: 'https://twitcasting.tv/h_neko20', icon: <TbBroadcast className="text-lg" />, c: 'bg-sky-400/10 text-sky-200 border-sky-400/20' },
-    { n: 'TikTok', url: '#', icon: <FaTiktok className="text-lg" />, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
+    { n: 'X (Twitter)', url: 'https://x.com/h_neko20?s=21', Icon: FaXTwitter, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
+    { n: 'YouTube', url: 'https://youtube.com/channel/UC_u4f-7IHt12WxU05JNctIQ?si=bzIZIOaWskbPPSX2', Icon: FaYoutube, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
+    { n: 'TwitCasting', url: 'https://twitcasting.tv/h_neko20', Icon: TbBroadcast, c: 'bg-sky-400/10 text-sky-200 border-sky-400/20' },
+    { n: 'TikTok', url: 'https://www.tiktok.com/@h_neko20?_r=1&_t=ZS-98sisJIc8iz', Icon: FaTiktok, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
 
   // ✅ ツイキャス＆YouTube API用
@@ -832,28 +832,29 @@ export default function Home() {
                   <p>ゲーム実況や歌ってみたを中心に<br className="hidden md:inline" />リスナーの皆と楽しい<br className="hidden md:inline" />空間を作っていくよ！</p>
                 </div>
                 <div className="bg-[#453e40] p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-white/5 space-y-4 md:space-y-8 shadow-inner w-full">
-                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">7月18日</span></div>
-                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">好きなもの</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">ゲーム</span></div>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">2月2日くらい</span></div>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">身長</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">160cmくらい</span></div>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">好きなもの</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">ゲーム、甘いもの</span></div>
                   <div className="flex justify-between pb-1 md:pb-2"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">ファンマーク</span><span className="text-lg md:text-xl lg:text-2xl text-[#f4ebeb]">🐈‍⬛⛓️</span></div>
                 </div>
               </div>
             </div>
           </motion.section>
 
-          <section className="py-20 lg:py-28 px-6 mb-32 lg:mb-48 relative">
-            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto z-10 relative">
+          <section className="py-20 lg:py-28 px-8 md:px-16 lg:px-24 mb-32 lg:mb-48 relative">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 w-full z-10 relative items-stretch">
               {snsLinks.map((sns) => (
                 <a 
                   key={sns.n} 
                   href={sns.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}
+                  className={`w-full h-full px-2 md:px-5 py-5 md:py-[18px] border ${sns.c} rounded-3xl text-[12px] md:text-lg font-bold tracking-wide md:tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-[18px]`}
                   onMouseEnter={() => setIsHoveringLink(true)}
                   onMouseLeave={() => setIsHoveringLink(false)}
                 >
-                  {sns.icon}
-                  <span className="mt-[2px]">{sns.n}</span>
+                  <sns.Icon className="text-2xl md:text-[27px] shrink-0" />
+                  <span className="mt-[2px] whitespace-nowrap">{sns.n}</span>
                 </a>
               ))}
             </div>
@@ -962,7 +963,10 @@ export default function Home() {
                 </p>
               </div>
 
-              <motion.button 
+              <motion.a
+                href="https://marshmallow-qa.com/mc6zg5s50zm51dq?t=qzPt3N&utm_medium=url_text&utm_source=promotion"
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 className="bg-[#3a3335] group-hover:bg-[#453e40] text-red-300 font-bold py-4 px-8 md:py-5 md:px-16 rounded-full text-sm md:text-base tracking-widest shadow-lg transition-all duration-300 border border-red-300/20 flex items-center justify-center gap-3 whitespace-nowrap w-[90%] max-w-[320px] mx-auto active:scale-95 z-20 group-hover:border-red-300"
                 onHoverStart={() => setIsHoveringLink(true)}
@@ -972,25 +976,25 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 マシュマロを送る
-              </motion.button>
+              </motion.a>
               
             </div>
           </motion.section>
 
-          <section className="py-16 lg:py-28 px-6 border-b border-white/5 mb-32 lg:mb-48">
-            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto">
+          <section className="py-16 lg:py-28 px-8 md:px-16 lg:px-24 border-b border-white/5 mb-32 lg:mb-48">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 w-full items-stretch">
               {snsLinks.map((sns) => (
                 <a 
                   key={`dup-${sns.n}`} 
                   href={sns.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full md:w-auto px-2 md:px-6 py-3 border ${sns.c} rounded-2xl text-[10px] md:text-xs font-bold tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-3`}
+                  className={`w-full h-full px-2 md:px-5 py-5 md:py-[18px] border ${sns.c} rounded-3xl text-[12px] md:text-lg font-bold tracking-wide md:tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-[18px]`}
                   onMouseEnter={() => setIsHoveringLink(true)}
                   onMouseLeave={() => setIsHoveringLink(false)}
                 >
-                  {sns.icon}
-                  <span className="mt-[2px]">{sns.n}</span>
+                  <sns.Icon className="text-2xl md:text-[27px] shrink-0" />
+                  <span className="mt-[2px] whitespace-nowrap">{sns.n}</span>
                 </a>
               ))}
             </div>
@@ -1025,7 +1029,7 @@ export default function Home() {
               <motion.div 
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                className="absolute bottom-[5%] left-[15%] w-[70%] max-w-lg aspect-[1/0.8] bg-gradient-to-b from-red-500/10 to-[#544b4d]/90 backdrop-blur-md border border-red-400/30 rounded-[40%_40%_50%_50%] shadow-2xl flex flex-col items-center justify-center p-10 transition-all duration-300 z-20 cursor-pointer"
+                className="absolute bottom-[5%] left-[15%] w-[70%] max-w-lg aspect-[1/0.8] bg-gradient-to-b from-red-500/10 to-[#544b4d]/90 backdrop-blur-md border border-red-400/30 rounded-[40%_40%_50%_50%] shadow-2xl flex flex-col items-center justify-center p-10 transition-all duration-300 hover:-translate-y-4 z-20 cursor-pointer"
                 onHoverStart={() => setIsHoveringLink(true)}
                 onHoverEnd={() => setIsHoveringLink(false)}
               >
@@ -1241,7 +1245,7 @@ export default function Home() {
                   onMouseEnter={() => setIsHoveringLink(true)}
                   onMouseLeave={() => setIsHoveringLink(false)}
                 >
-                  {sns.icon}
+                  <sns.Icon className="text-lg" />
                   <span className="mt-[2px]">{sns.n}</span>
                 </a>
               ))}
@@ -1253,7 +1257,7 @@ export default function Home() {
               </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
-                サイト制作🐾: <span className="text-white/80">"政獣たちのいるところ：火日"</span>
+                サイト制作🐾: <span className="text-white/80">"火日"</span>
               </p>
             </div>
 
