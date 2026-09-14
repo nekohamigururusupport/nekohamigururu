@@ -10,6 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* 5段対応
+     モバイルS: <430 (iPhone 16 / 15 = 390)
+     モバイルL: sm 430 (iPhone 16/17 Pro Max)
+     タブレットS: md 768 (iPad 11" portrait / iPad mini)
+     タブレットL: lg 1024 (iPad 13" portrait / 11" landscape)
+     PC: xl 1280+
+  */
+  --breakpoint-sm: 430px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +30,13 @@
   }
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }

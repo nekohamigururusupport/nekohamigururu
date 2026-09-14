@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from
 import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 import { isSiteReleased } from '@/lib/site-release';
+import { translations, LANG_OPTIONS, type Lang } from '@/lib/i18n';
 
 const preReleaseTitleParts = [
   { text: 'とある', className: 'text-[#f4ebeb]' },
@@ -127,7 +128,7 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
             {chars.map((char, i) => (
             <motion.span
               key={i}
-              className={`text-5xl md:text-7xl lg:text-8xl font-black ${
+              className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black ${
                 i < 2 ? 'text-[#f4ebeb]' : 'text-red-400'
               }`}
               style={{
@@ -173,7 +174,7 @@ const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotat
   >
     <div className="absolute top-[-22%] left-[calc(50%-10px)] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[18px] border-b-red-400 opacity-80 z-[-1] transition-transform duration-300 group-hover:scale-110"></div>
     <span className="text-sm md:text-base font-bold text-red-300">{date}</span>
-    <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium whitespace-pre-wrap">{title}</span>
+            <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium whitespace-pre-wrap">{title}</span>
   </motion.div>
 );
 
@@ -190,7 +191,91 @@ const menuPawParticles = [
   { left: '85%', rotateFrom: 190, rotateTo: 360 },
 ];
 
-const ContactTapHint = ({ hidden }: { hidden: boolean }) => {
+const mashmallowPawTrail = [
+  { left: '8%', top: '76%' },
+  { left: '26%', top: '60%' },
+  { left: '44%', top: '44%' },
+  { left: '62%', top: '28%' },
+  { left: '80%', top: '12%' },
+];
+
+const LanguageSwitcher = ({
+  lang,
+  onChange,
+}: {
+  lang: Lang;
+  onChange: (next: Lang) => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const current = LANG_OPTIONS.find((l) => l.id === lang)!;
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener('mousedown', onDown);
+    return () => window.removeEventListener('mousedown', onDown);
+  }, []);
+
+  return (
+    <div ref={wrapRef} className="relative z-[70] shrink-0">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full border-2 border-red-400/50 bg-[#3a3335] text-[#f4ebeb] text-[10px] sm:text-xs md:text-sm font-black tracking-wider hover:border-red-300 hover:text-red-300 transition-all shadow-[0_0_12px_rgba(248,113,113,0.25)]"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+      >
+        <span>{current.label}</span>
+        <svg
+          className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.98 }}
+            transition={{ duration: 0.16 }}
+            className="absolute right-0 top-[calc(100%+10px)] min-w-[11rem] rounded-2xl border-2 border-red-400/40 bg-[#2a2526]/95 backdrop-blur-md shadow-[0_12px_30px_rgba(0,0,0,0.45)] overflow-hidden"
+            role="listbox"
+          >
+            {LANG_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                role="option"
+                aria-selected={opt.id === lang}
+                onClick={() => {
+                  onChange(opt.id);
+                  setOpen(false);
+                }}
+                className={`w-full px-4 py-3 text-sm font-bold tracking-wide transition-colors flex items-center gap-2 ${
+                  opt.id === lang
+                    ? 'bg-red-400/20 text-red-300'
+                    : 'text-[#f4ebeb] hover:bg-white/10 hover:text-red-200'
+                }`}
+              >
+                <span className="text-[10px] opacity-60">{opt.short}</span>
+                <span>{opt.label}</span>
+                {opt.id === lang && <FaPaw className="text-xs" />}
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+const ContactTapHint = ({ hidden, label }: { hidden: boolean; label: string }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -206,7 +291,7 @@ const ContactTapHint = ({ hidden }: { hidden: boolean }) => {
     <AnimatePresence>
       {!hidden && (
         <motion.div
-          className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[calc(100%+2.7rem)] pointer-events-none select-none z-[35] hidden md:block"
+          className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[calc(100%+2.7rem)] pointer-events-none select-none z-[35] hidden xl:block"
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -8 }}
@@ -218,7 +303,7 @@ const ContactTapHint = ({ hidden }: { hidden: boolean }) => {
             transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <span className="text-[1.8rem] lg:text-[2rem] font-bold tracking-[0.14em] text-[#ffe8ec] drop-shadow-[0_0_10px_rgba(255,200,210,0.65)] whitespace-nowrap">
-              タップ
+              {label}
             </span>
             <motion.span
               className="text-[2rem] lg:text-4xl text-red-400 drop-shadow-[0_0_16px_rgba(248,113,113,0.9)] leading-none"
@@ -281,6 +366,9 @@ const LiveStreamThumbnail = ({ primarySrc }: { primarySrc: string }) => {
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [lang, setLang] = useState<Lang>('ja');
+  const t = translations[lang];
+  const fmtDate = (d: string) => (d.includes('未定') ? t.undecided : d);
   
   const [isTicketCut, setIsTicketCut] = useState(false);
   const cutTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -386,6 +474,16 @@ export default function Home() {
     { n: 'TikTok', url: 'https://www.tiktok.com/@h_neko20?_r=1&_t=ZS-98sisJIc8iz', Icon: FaTiktok, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
 
+  const navItems = [
+    { key: 'top' as const, href: '#top' },
+    { key: 'profile' as const, href: '#profile' },
+    { key: 'tags' as const, href: '#tags' },
+    { key: 'music' as const, href: '#music' },
+    { key: 'marshmallow' as const, href: '#message' },
+    { key: 'schedule' as const, href: '#schedule' },
+    { key: 'contact' as const, href: '#contact', mobileHref: '#contact-mobile' },
+  ];
+
   // ✅ ツイキャス＆YouTube API用
   const [liveInfo, setLiveInfo] = useState<{ isLive: boolean, platform: string, title: string, url: string, thumbnail: string }>({
     isLive: false,
@@ -442,6 +540,16 @@ export default function Home() {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [mouseX, mouseY]);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem('gururu-lang');
+    if (saved === 'ja' || saved === 'en' || saved === 'ko') setLang(saved);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('gururu-lang', lang);
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const handleCutTicket = () => {
     if (!isTicketCut) {
@@ -500,7 +608,7 @@ export default function Home() {
                   className="text-red-300 hover:text-red-200 text-sm md:text-base font-bold tracking-widest mt-2 flex items-center gap-2 transition-colors underline underline-offset-4 decoration-red-400/80 decoration-2 hover:decoration-red-300 drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]"
                 >
                   <FaXTwitter className="text-base md:text-lg" />
-                  Official X をフォローして待っててね！
+                  {t.followX}
                 </a>
               </div>
             </motion.div>
@@ -520,7 +628,7 @@ export default function Home() {
       </AnimatePresence>
 
       <motion.div
-        className="fixed inset-0 z-[10000] pointer-events-none hidden md:block"
+        className="fixed inset-0 z-[10000] pointer-events-none hidden xl:block"
         style={{ x: cursorX, y: cursorY }}
       >
         <motion.div 
@@ -549,6 +657,7 @@ export default function Home() {
         </AnimatePresence>
       </motion.div>
 
+      {/* TODO: PCのみ画面下SD。魚をぐるるが一方通行で追う。端で反転せずリスポーン。肉球トレイル最大3。イラスト待ち。 */}
       <main className={`min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 relative ${showSplash ? 'h-screen overflow-hidden' : 'overflow-x-hidden'}`}>
         <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-50"></div>
 
@@ -572,28 +681,29 @@ export default function Home() {
 
         <div className="w-full min-h-screen relative z-10">
           
-          <header className="fixed top-0 w-full h-16 bg-[#453e40]/90 backdrop-blur-sm border-b border-white/10 z-[60] flex items-center justify-between px-6 md:px-16 shadow-sm">
+          <header className="fixed top-0 w-full h-16 bg-[#453e40]/90 backdrop-blur-sm border-b border-white/10 z-[60] flex items-center justify-between px-4 sm:px-6 md:px-10 xl:px-16 shadow-sm overflow-visible">
             <div className="flex items-center gap-2">
               <span className="text-2xl opacity-80">🐾</span>
-              <div className="text-[#f4ebeb] font-bold text-base tracking-[0.1em] cursor-default">
+              <div className="text-[#f4ebeb] font-bold text-sm sm:text-base tracking-[0.1em] cursor-default">
                 猫喰<span className="text-red-300 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
               </div>
             </div>
 
-            <nav className="hidden md:flex gap-10 text-[20px] tracking-wide text-[#d1c5c7] font-bold">
-              {['TOP', 'PROFILE', 'TAGS', 'MUSIC', 'MESSAGE', 'SCHEDULE'].map((item) => (
+            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 xl:gap-6">
+            <nav className="hidden xl:flex gap-5 2xl:gap-10 text-[17px] 2xl:text-[20px] tracking-wide text-[#d1c5c7] font-bold">
+              {navItems.map((item) => (
                 <motion.a 
-                  key={item} 
-                  href={`#${item.toLowerCase()}`}
-                  className="hover:text-red-300 transition-all uppercase"
+                  key={item.key} 
+                  href={item.href}
+                  className="hover:text-red-300 transition-all whitespace-nowrap"
                   onHoverStart={() => setIsHoveringLink(true)}
                   onHoverEnd={() => setIsHoveringLink(false)}
-                >{item}</motion.a>
+                >{t.nav[item.key]}</motion.a>
               ))}
             </nav>
-
+            <LanguageSwitcher lang={lang} onChange={setLang} />
             <button 
-              className="md:hidden text-[#f4ebeb] p-2 focus:outline-none"
+              className="xl:hidden text-[#f4ebeb] p-2 focus:outline-none"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -604,6 +714,7 @@ export default function Home() {
                 )}
               </svg>
             </button>
+            </div>
           </header>
 
           <AnimatePresence>
@@ -612,7 +723,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="fixed top-16 left-0 w-full bg-[#3a3335]/95 backdrop-blur-md border-b border-white/10 flex flex-col items-center py-4 gap-3 md:hidden z-[55] shadow-xl overflow-hidden"
+                className="fixed top-16 left-0 w-full bg-[#3a3335]/95 backdrop-blur-md border-b border-white/10 flex flex-col items-center py-4 md:py-6 gap-3 md:gap-4 xl:hidden z-[55] shadow-xl overflow-hidden"
               >
                 <div className="absolute inset-0 z-0 pointer-events-none">
                   {menuPawParticles.map((p, i) => (
@@ -637,54 +748,54 @@ export default function Home() {
                   ))}
                 </div>
 
-                {['TOP', 'PROFILE', 'TAGS', 'MUSIC', 'MESSAGE', 'SCHEDULE'].map((item) => (
+                {navItems.map((item) => (
                   <a 
-                    key={item} 
-                    href={`#${item.toLowerCase()}`}
+                    key={item.key} 
+                    href={item.mobileHref ?? item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="text-[#f4ebeb] font-bold text-[11px] tracking-[0.2em] hover:text-red-300 transition-colors uppercase relative z-10"
+                    className="text-[#f4ebeb] font-bold text-sm md:text-base lg:text-lg tracking-[0.2em] hover:text-red-300 transition-colors relative z-10"
                   >
-                    {item}
+                    {t.nav[item.key]}
                   </a>
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
 
-          <section id="top" className="min-h-[80vh] md:min-h-screen flex flex-col md:flex-row items-center justify-center px-6 md:px-24 pt-28 md:pt-16 mb-32 lg:mb-48 relative scroll-mt-24 gap-12 md:gap-0">
-            <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-10 flex flex-col items-center md:items-start">
-              <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[13px] md:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
-                Vtuberを目指す
+          <section id="top" className="min-h-[80vh] md:min-h-0 xl:min-h-screen flex flex-col md:flex-row items-center justify-start xl:justify-center px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 pt-24 sm:pt-28 md:pt-28 lg:pt-24 xl:pt-16 pb-16 md:pb-20 xl:pb-0 mb-24 sm:mb-32 lg:mb-48 relative scroll-mt-24 gap-8 sm:gap-12 md:gap-10 lg:gap-12 xl:gap-0">
+            <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-6 xl:pl-10 flex flex-col items-center md:items-start">
+              <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[12px] sm:text-[13px] md:text-[16px] lg:text-[18px] xl:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
+                {t.fvBadge}
               </div>
-              <h1 className="text-[38px] md:text-7xl lg:text-9xl font-black text-[#f4ebeb] tracking-[15px] leading-tight whitespace-nowrap ml-[10px] md:ml-[20px]">
+              <h1 className="text-[32px] sm:text-[36px] md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-9xl font-black text-[#f4ebeb] tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.2em] xl:tracking-[15px] leading-tight whitespace-nowrap ml-[6px] sm:ml-[10px] md:ml-[16px] xl:ml-[20px]">
                 猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
               </h1>
               
-              <p className="text-[#c2b6b8] text-[10px] md:text-xs lg:text-[21px] tracking-[1em] mt-2 font-bold uppercase lg:ml-[30px]">
+              <p className="text-[#c2b6b8] text-[9px] sm:text-[10px] md:text-[11px] lg:text-sm xl:text-[21px] tracking-[0.55em] sm:tracking-[0.7em] md:tracking-[0.35em] lg:tracking-[0.4em] xl:tracking-[1em] mt-2 font-bold uppercase whitespace-nowrap lg:ml-[20px] xl:ml-[30px]">
                 NEKOHAMI GURURU
               </p>
 
               {/* ========================================== */}
-              {/* ▼ PC用サブタイトル（スマホでは消える） ▼ */}
+              {/* ▼ PC用サブタイトル（1280px以上） ▼ */}
               {/* ========================================== */}
-              <div className="hidden md:flex items-center justify-start mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] whitespace-nowrap w-full">
-                <span className="text-[28px] lg:text-[40px]">手懐けられないわがまま猫な</span>
+              <div className={`hidden xl:flex items-center justify-start mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full ${lang === 'ja' ? 'whitespace-nowrap' : 'flex-wrap'}`}>
+                <span className={`text-[28px] 2xl:text-[40px] ${lang === 'ja' ? '' : 'whitespace-normal'}`}>{t.fvSubLead}</span>
                 <span className="flex flex-row items-center mx-3 whitespace-nowrap">
-                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">🐈‍⬛</span>
-                  <span className="text-[28px] lg:text-[40px] mx-3">新人配信者</span>
-                  <span className="text-[24px] lg:text-[30px] opacity-90 tracking-normal">⛓️</span>
+                  <span className="text-[24px] 2xl:text-[30px] opacity-90 tracking-normal">🐈‍⬛</span>
+                  <span className="text-[28px] 2xl:text-[40px] mx-3">{t.fvSubRole}</span>
+                  <span className="text-[24px] 2xl:text-[30px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
 
               {/* ========================================== */}
-              {/* ▼ スマホ用サブタイトル（PCでは消える） ▼ */}
+              {/* ▼ モバイル・タブレット用サブタイトル ▼ */}
               {/* ========================================== */}
-              <div className="flex md:hidden flex-col items-center justify-center mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full">
-                <span className="text-[17px] sm:text-[20px] whitespace-nowrap">手懐けられないわがまま猫な</span>
+              <div className="flex xl:hidden flex-col items-center md:items-start justify-center mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full">
+                <span className={`text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] ${lang === 'ja' ? 'whitespace-nowrap' : 'whitespace-normal text-center md:text-left'}`}>{t.fvSubLead}</span>
                 <span className="flex flex-row items-center mt-2 whitespace-nowrap">
-                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">🐈‍⬛</span>
-                  <span className="text-[22px] sm:text-[24px] mx-2">新人配信者</span>
-                  <span className="text-[16px] sm:text-[18px] opacity-90 tracking-normal">⛓️</span>
+                  <span className="text-[15px] sm:text-[16px] md:text-[20px] lg:text-[24px] opacity-90 tracking-normal">🐈‍⬛</span>
+                  <span className="text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] mx-2">{t.fvSubRole}</span>
+                  <span className="text-[15px] sm:text-[16px] md:text-[20px] lg:text-[24px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
               
@@ -709,7 +820,7 @@ export default function Home() {
               }}
             >
               <motion.div 
-                className="relative h-64 md:h-[450px] lg:h-[550px] aspect-square bg-[#544b4d] border border-white/10 rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group transition-all"
+                className="relative h-56 sm:h-64 md:h-[360px] lg:h-[460px] xl:h-[550px] aspect-square bg-[#544b4d] border border-white/10 rounded-[3rem] md:rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group transition-all"
                 style={{ rotateX: tiltRotateX, rotateY: tiltRotateY }}
               >
                 <div
@@ -733,7 +844,7 @@ export default function Home() {
 
           {/* ▼▼▼ YouTubeとツイキャスでデザインが変わるハイブリッドバナー ▼▼▼ */}
           {liveInfo.isLive && (
-            <section className="px-6 md:px-16 lg:px-24 mb-32 lg:mb-48 max-w-[min(100%,88rem)] mx-auto scroll-mt-24">
+            <section className="px-4 sm:px-6 md:px-16 lg:px-24 mb-32 lg:mb-48 max-w-[min(100%,88rem)] mx-auto scroll-mt-24">
               <div
                 className={`rounded-[2.5rem] md:rounded-[4rem] border backdrop-blur-md min-h-[60vh] p-6 md:p-8 lg:p-12 relative overflow-hidden bg-[#544b4d]/75 ${
                   liveInfo.platform === 'youtube'
@@ -787,7 +898,7 @@ export default function Home() {
                       {liveInfo.title}
                     </h3>
                     <p className="text-sm md:text-base text-[#d1c5c7] mb-8 max-w-md leading-relaxed font-bold">
-                      {liveInfo.platform === 'youtube' ? 'YouTubeにて配信中！遊びにきてね！' : 'TwitCastingにて配信中！遊びにきてね！'}
+                      {liveInfo.platform === 'youtube' ? t.liveYoutube : t.liveTwicast}
                     </p>
 
                     <motion.a
@@ -804,7 +915,7 @@ export default function Home() {
                       onHoverEnd={() => setIsHoveringLink(false)}
                     >
                       {liveInfo.platform === 'youtube' ? <FaYoutube className="text-lg" /> : <TbBroadcast className="text-lg" />}
-                      配信を見に行く
+                      {t.liveWatch}
                     </motion.a>
                   </div>
                 </div>
@@ -815,45 +926,59 @@ export default function Home() {
 
           <motion.section 
             id="profile"
-            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto scroll-mt-24"
+            className="px-4 sm:px-6 md:px-12 lg:px-24 xl:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto scroll-mt-24"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
-            <div className="bg-[#544b4d] rounded-[2.5rem] md:rounded-[4rem] px-8 pt-10 pb-10 md:p-16 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center">
+            <div className="bg-[#544b4d] rounded-[2.5rem] md:rounded-[4rem] px-6 sm:px-8 pt-10 pb-10 md:p-12 lg:p-16 xl:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center">
               <div className="absolute top-10 right-10 text-9xl opacity-[0.01] rotate-12">🐾</div>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-red-300 mb-10 md:mb-16 flex items-center gap-4 tracking-widest drop-shadow-sm">
-                <span className="text-red-400 opacity-50">🐾</span> 噛み跡紹介
+                <span className="text-red-400 opacity-50">🐾</span> {t.profileTitle}
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 lg:gap-10 items-center w-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-10 items-center w-full">
                 <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16px] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
-                  <p>猫喰ぐるる（Nekohami Gururu）<br className="hidden md:inline" />ポップな可愛さの裏に魚の骨のような<br className="hidden md:inline" />鋭いこだわりを隠し持つ、<br className="hidden md:inline" />新人Vチューバーを目指している</p>
-                  <p>ゲーム実況や歌ってみたを中心に<br className="hidden md:inline" />リスナーの皆と楽しい<br className="hidden md:inline" />空間を作っていくよ！</p>
+                  <p>
+                    {t.bio1.split('\n').map((line, i, arr) => (
+                      <span key={i}>
+                        {line}
+                        {i < arr.length - 1 && <br className="hidden md:inline" />}
+                      </span>
+                    ))}
+                  </p>
+                  <p>
+                    {t.bio2.split('\n').map((line, i, arr) => (
+                      <span key={i}>
+                        {line}
+                        {i < arr.length - 1 && <br className="hidden md:inline" />}
+                      </span>
+                    ))}
+                  </p>
                 </div>
                 <div className="bg-[#453e40] p-6 md:p-10 lg:p-12 rounded-[2rem] md:rounded-[2.5rem] border border-white/5 space-y-4 md:space-y-8 shadow-inner w-full">
-                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">誕生日</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">2月2日くらい</span></div>
-                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">身長</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">160cmくらい</span></div>
-                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">好きなもの</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">ゲーム、甘いもの</span></div>
-                  <div className="flex justify-between pb-1 md:pb-2"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">ファンマーク</span><span className="text-lg md:text-xl lg:text-2xl text-[#f4ebeb]">🐈‍⬛⛓️</span></div>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">{t.birthday}</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">{t.birthdayValue}</span></div>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">{t.height}</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">{t.heightValue}</span></div>
+                  <div className="flex justify-between border-b border-white/5 pb-3 md:pb-4"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">{t.likes}</span><span className="text-base md:text-lg lg:text-xl font-bold text-[#f4ebeb]">{t.likesValue}</span></div>
+                  <div className="flex justify-between pb-1 md:pb-2"><span className="text-sm md:text-base lg:text-lg text-[#a89c9e] font-medium">{t.fanMark}</span><span className="text-lg md:text-xl lg:text-2xl text-[#f4ebeb]">🐈‍⬛⛓️</span></div>
                 </div>
               </div>
             </div>
           </motion.section>
 
-          <section className="py-20 lg:py-28 px-8 md:px-16 lg:px-24 mb-32 lg:mb-48 relative">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 w-full z-10 relative items-stretch">
+          <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 mb-32 lg:mb-48 relative">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12 w-full z-10 relative items-stretch">
               {snsLinks.map((sns) => (
                 <a 
                   key={sns.n} 
                   href={sns.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full h-full px-2 md:px-5 py-5 md:py-[18px] border ${sns.c} rounded-3xl text-[12px] md:text-lg font-bold tracking-wide md:tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-[18px]`}
+                  className={`w-full h-full px-1.5 sm:px-2 md:px-4 lg:px-5 py-4 sm:py-5 md:py-[18px] border ${sns.c} rounded-2xl sm:rounded-3xl text-[10px] sm:text-[12px] md:text-base lg:text-lg font-bold tracking-wide md:tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-[18px]`}
                   onMouseEnter={() => setIsHoveringLink(true)}
                   onMouseLeave={() => setIsHoveringLink(false)}
                 >
-                  <sns.Icon className="text-2xl md:text-[27px] shrink-0" />
+                  <sns.Icon className="text-lg sm:text-xl md:text-2xl lg:text-[22px] xl:text-[27px] shrink-0" />
                   <span className="mt-[2px] whitespace-nowrap">{sns.n}</span>
                 </a>
               ))}
@@ -862,7 +987,7 @@ export default function Home() {
 
           <motion.section 
             id="tags"
-            className="px-6 md:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto scroll-mt-24"
+            className="px-4 sm:px-6 md:px-12 lg:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto scroll-mt-24"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -871,8 +996,10 @@ export default function Home() {
             <h2 className="text-2xl lg:text-3xl font-bold text-[#e8dbdd] mb-12 tracking-widest text-center">OFFICIAL TAGS</h2>
             <div className="flex flex-col md:flex-row justify-center gap-8">
               {[
-                { label: '総合タグ', tag: '#ぐるるの爪痕' },
-                { label: 'ファンアート', tag: '#ぐるるの噛み跡' },
+                // TODO: 総合タグは仮置き。配信で募集して決める可能性あり。
+                // その場合は表示を「？？？」or「募集中」にし、総合タグだけX検索リンクを無効化する（ファンアートは現状維持）。
+                { label: t.tagGeneral, tag: '#ぐるるのおもちゃ' },
+                { label: t.tagFanart, tag: '#ぐるるの噛み跡' },
               ].map((t) => (
                 <motion.a 
                   key={t.label} 
@@ -886,7 +1013,7 @@ export default function Home() {
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-10 transition-opacity"></div>
                   <p className="text-sm lg:text-base text-red-300/80 mb-4 font-black">{t.label}</p>
                   <p className="text-2xl lg:text-3xl font-black text-[#f4ebeb] tracking-wider group-hover:text-red-300 transition-colors">{t.tag}</p>
-                  <div className="mt-6 text-xs text-gray-400 animate-pulse">X (Twitter) で検索 ↗</div>
+                  <div className="mt-6 text-xs text-gray-400 animate-pulse">{t.tagSearch}</div>
                 </motion.a>
               ))}
             </div>
@@ -894,37 +1021,60 @@ export default function Home() {
 
           <motion.section 
             id="music"
-            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto scroll-mt-24"
+            className="px-4 sm:px-6 md:px-12 lg:px-24 xl:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto scroll-mt-24"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
             <h2 className="text-2xl lg:text-4xl font-black text-[#f4ebeb] mb-16 tracking-tight drop-shadow-sm">LISTEN MUSIC</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
-              {[1, 2].map((i) => (
-                <motion.div 
-                  key={i} 
-                  className="group cursor-pointer"
-                  onHoverStart={() => setIsHoveringLink(true)}
-                  onHoverEnd={() => setIsHoveringLink(false)}
-                >
-                  <motion.div 
-                    className="aspect-video bg-[#544b4d] border border-white/10 rounded-[3rem] mb-6 flex items-center justify-center overflow-hidden relative shadow-xl"
+            <motion.div
+              className="w-full group"
+              onHoverStart={() => setIsHoveringLink(true)}
+              onHoverEnd={() => setIsHoveringLink(false)}
+            >
+              <div className="aspect-video bg-[#544b4d]/80 backdrop-blur-md border border-red-400/20 rounded-[3rem] flex flex-col items-center justify-center overflow-hidden relative shadow-xl transition-all duration-500 hover:border-red-400/40 hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.25)]">
+                <GlassPawBG className="w-40 h-40 md:w-64 md:h-64 top-[-10%] left-[-6%] rotate-12" />
+                <GlassPawBG className="w-36 h-36 md:w-52 md:h-52 bottom-[-12%] right-[-4%] -rotate-[30deg]" />
+                <GlassPawBG className="hidden md:block w-24 h-24 top-[8%] right-[14%] rotate-[50deg]" />
+
+                <div className="absolute inset-0 pointer-events-none opacity-45">
+                  <FaPaw className="absolute bottom-[14%] left-[8%] text-4xl md:text-6xl text-[#3a3335] -rotate-12" />
+                  <FaPaw className="absolute top-[16%] left-[18%] text-3xl md:text-5xl text-[#3a3335] rotate-12" />
+                  <FaPaw className="absolute top-[20%] right-[14%] text-4xl md:text-5xl text-[#3a3335] -rotate-6" />
+                  <FaPaw className="absolute bottom-[18%] right-[10%] text-3xl md:text-6xl text-[#3a3335] rotate-[18deg]" />
+                </div>
+
+                <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 via-transparent to-red-300/5 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-red-400/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+                <div className="relative z-10 flex flex-col items-center gap-5 md:gap-7 px-4 md:px-6">
+                  <motion.div
+                    className="w-16 h-16 md:w-20 md:h-20 bg-red-500/15 rounded-full flex items-center justify-center backdrop-blur-sm border border-red-300/30 shadow-[0_0_28px_rgba(248,113,113,0.35)]"
+                    animate={{ y: [0, -7, 0] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
                   >
-                    <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-125 transition-transform backdrop-blur-sm relative z-10">
-                      <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[16px] border-l-red-300 border-b-[10px] border-b-transparent ml-1"></div>
-                    </div>
+                    <FaPaw className="text-2xl md:text-3xl text-red-300 drop-shadow-[0_0_8px_rgba(248,113,113,0.8)]" />
                   </motion.div>
-                  <h3 className="text-lg lg:text-xl font-bold text-[#d1c5c7] group-hover:text-red-300 transition-colors px-4">歌ってみた動画のタイトル {i}</h3>
-                </motion.div>
-              ))}
-            </div>
+                  <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 lg:gap-8">
+                    <span className="text-xl sm:text-2xl md:text-4xl lg:text-5xl drop-shadow-[0_0_10px_rgba(255,220,227,0.45)] shrink-0">🐈‍⬛</span>
+                    <motion.p
+                      className="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-red-300 font-black tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.22em] lg:tracking-[0.28em] xl:tracking-[0.35em] drop-shadow-[0_0_10px_rgba(248,113,113,0.65)] whitespace-nowrap"
+                      animate={{ rotate: [-1.4, 1.4, -1.4], y: [0, -3, 0] }}
+                      transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+                    >
+                      COMING SOON
+                    </motion.p>
+                    <span className="text-xl sm:text-2xl md:text-4xl lg:text-5xl drop-shadow-[0_0_10px_rgba(255,220,227,0.45)] shrink-0">⛓️</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </motion.section>
 
           <motion.section 
             id="message"
-            className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-6xl mx-auto scroll-mt-24 relative"
+            className="px-4 sm:px-6 md:px-12 lg:px-24 xl:px-40 mb-32 lg:mb-48 max-w-6xl mx-auto scroll-mt-24 relative"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -934,12 +1084,28 @@ export default function Home() {
           >
             <div className="bg-[#544b4d]/80 backdrop-blur-md border border-white/5 rounded-2xl md:rounded-[2.5rem] p-8 md:p-16 lg:p-20 text-center shadow-2xl relative overflow-hidden min-h-[60vh] flex flex-col justify-center items-center group z-10 cursor-pointer transition-all duration-500 hover:drop-shadow-[0_0_15px_rgba(244,114,182,0.2)]">
               
-              <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
-                <FaPaw className="absolute bottom-10 left-[10%] text-6xl text-[#3a3335] -rotate-12" />
-                <FaPaw className="absolute top-[60%] left-[25%] text-6xl text-[#3a3335] rotate-12" />
-                <FaPaw className="absolute top-[35%] left-[45%] text-6xl text-[#3a3335] -rotate-6" />
-                <FaPaw className="absolute top-10 left-[65%] text-6xl text-[#3a3335] rotate-6" />
-                <FaPaw className="absolute top-[-20px] left-[85%] text-6xl text-[#3a3335] rotate-12" />
+              <div className="absolute inset-0 pointer-events-none z-0">
+                {mashmallowPawTrail.map((p, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute text-5xl md:text-6xl rotate-[28deg]"
+                    style={{ left: p.left, top: p.top, translateY: i % 2 === 0 ? '-6px' : '6px' }}
+                    animate={{ opacity: [0, 1, 1, 0] }}
+                    transition={{
+                      duration: 5.2,
+                      delay: i * 0.5,
+                      repeat: Infinity,
+                      repeatDelay: 2.4,
+                      ease: 'easeInOut',
+                      times: [0, 0.1, 0.72, 1],
+                    }}
+                  >
+                    <span className="relative inline-flex">
+                      <FaPaw className="absolute text-red-300/70 scale-[1.07] drop-shadow-[0_0_4px_rgba(252,165,165,0.55)]" />
+                      <FaPaw className="relative text-[#3a3335]" />
+                    </span>
+                  </motion.div>
+                ))}
               </div>
 
               <div className="absolute top-0 left-0 w-full h-[120px] md:h-[200px] border-t border-white/5 bg-gradient-to-b from-white/5 to-transparent [clip-path:polygon(0_0,100%_0,50%_100%)] pointer-events-none z-10"></div>
@@ -949,17 +1115,26 @@ export default function Home() {
               <div className="absolute inset-0 bg-red-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"></div>
 
               <div className="relative mb-8 md:mb-12 z-20 mt-6 group-hover:drop-shadow-[0_0_8px_rgba(255,220,227,0.4)] transition-all duration-300">
-                <div className="inline-block mb-3 text-red-400/30 text-2xl md:text-3xl"><FaPaw /></div>
-                <h2 className="text-xl md:text-3xl lg:text-4xl font-black text-[#f4ebeb] mb-0 tracking-widest drop-shadow-sm flex items-center justify-center gap-2 whitespace-nowrap">
-                  ぐるるに質問ある？
+                <motion.div
+                  className="inline-block mb-3 text-red-400/40 text-2xl md:text-3xl"
+                  animate={{ y: [0, -7, 0] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <FaPaw />
+                </motion.div>
+                <h2 className={`text-lg sm:text-xl md:text-3xl lg:text-4xl font-black text-[#f4ebeb] mb-0 tracking-widest drop-shadow-sm flex items-center justify-center gap-2 px-2 ${lang === 'ja' ? 'whitespace-nowrap' : 'text-center'}`}>
+                  {t.mashTitle}
                 </h2>
               </div>
 
               <div className="w-full max-w-2xl mx-auto relative z-20 mb-12 md:mb-16">
                 <p className="text-[13px] md:text-base lg:text-lg text-[#d1c5c7] leading-loose md:leading-[2.5] font-medium tracking-wide group-hover:text-[#e8dbdd] transition-colors">
-                  配信の感想とか、やってほしいゲームとか、どうでもいい日常の報告とか。<br className="hidden md:inline" />
-                  気が向いた時に、気まぐれに配信で拾ってあげるかも。<br className="hidden md:inline" />
-                  ……別に、ずっと待ってるわけじゃないけどね.
+                  {t.mashBody.split('\n').map((line, i, arr) => (
+                    <span key={i}>
+                      {line}
+                      {i < arr.length - 1 && <br className="hidden md:inline" />}
+                    </span>
+                  ))}
                 </p>
               </div>
 
@@ -968,62 +1143,80 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
-                className="bg-[#3a3335] group-hover:bg-[#453e40] text-red-300 font-bold py-4 px-8 md:py-5 md:px-16 rounded-full text-sm md:text-base tracking-widest shadow-lg transition-all duration-300 border border-red-300/20 flex items-center justify-center gap-3 whitespace-nowrap w-[90%] max-w-[320px] mx-auto active:scale-95 z-20 group-hover:border-red-300"
+                animate={{
+                  boxShadow: [
+                    '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 0 0px rgba(248,113,113,0)',
+                    '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 0 22px rgba(248,113,113,0.4)',
+                    '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 0 0px rgba(248,113,113,0)',
+                  ],
+                }}
+                transition={{
+                  boxShadow: { duration: 2.8, repeat: Infinity, ease: 'easeInOut' },
+                  scale: { duration: 0.2 },
+                }}
+                className="bg-[#3a3335] group-hover:bg-[#453e40] text-red-300 font-bold py-4 px-6 sm:px-8 md:py-5 md:px-16 rounded-full text-xs sm:text-sm md:text-base tracking-widest shadow-lg border border-red-300/20 flex items-center justify-center gap-3 whitespace-nowrap w-[90%] max-w-[320px] mx-auto active:scale-95 z-20 group-hover:border-red-300"
                 onHoverStart={() => setIsHoveringLink(true)}
                 onHoverEnd={() => setIsHoveringLink(false)}
               >
-                <svg className="w-5 h-5 md:w-6 md:h-6 opacity-80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <motion.svg
+                  className="w-5 h-5 md:w-6 md:h-6 opacity-80"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  animate={{ rotate: [-6, 6, -6] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                マシュマロを送る
+                </motion.svg>
+                {t.mashButton}
               </motion.a>
               
             </div>
           </motion.section>
 
-          <section className="py-16 lg:py-28 px-8 md:px-16 lg:px-24 border-b border-white/5 mb-32 lg:mb-48">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 w-full items-stretch">
+          <section className="py-16 lg:py-28 px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 border-b border-white/5 mb-32 lg:mb-48">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-12 w-full items-stretch">
               {snsLinks.map((sns) => (
                 <a 
                   key={`dup-${sns.n}`} 
                   href={sns.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full h-full px-2 md:px-5 py-5 md:py-[18px] border ${sns.c} rounded-3xl text-[12px] md:text-lg font-bold tracking-wide md:tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 md:gap-[18px]`}
+                  className={`w-full h-full px-1.5 sm:px-2 md:px-4 lg:px-5 py-4 sm:py-5 md:py-[18px] border ${sns.c} rounded-2xl sm:rounded-3xl text-[10px] sm:text-[12px] md:text-base lg:text-lg font-bold tracking-wide md:tracking-widest hover:scale-105 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-[18px]`}
                   onMouseEnter={() => setIsHoveringLink(true)}
                   onMouseLeave={() => setIsHoveringLink(false)}
                 >
-                  <sns.Icon className="text-2xl md:text-[27px] shrink-0" />
+                  <sns.Icon className="text-lg sm:text-xl md:text-2xl lg:text-[22px] xl:text-[27px] shrink-0" />
                   <span className="mt-[2px] whitespace-nowrap">{sns.n}</span>
                 </a>
               ))}
             </div>
           </section>
 
-          <section id="schedule" className="px-6 md:px-24 lg:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto flex flex-col items-center scroll-mt-24">
-            <div className="text-center mb-8 relative hidden md:block">
+          <section id="schedule" className="px-4 sm:px-6 md:px-12 lg:px-24 xl:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto flex flex-col items-center scroll-mt-24">
+            <div className="text-center mb-8 relative hidden xl:block">
               <h2 className="text-3xl lg:text-5xl font-black text-red-300 tracking-[0.2em] drop-shadow-[0_0_8px_rgba(248,113,113,0.4)] flex items-center justify-center gap-2">
-                気まぐれ
-                <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] text-[1.2em] leading-none mt-[-0.1em]">配信</span>
-                スケジュール
+                {t.scheduleTitleLead}
+                <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] text-[1.2em] leading-none mt-[-0.1em]">{t.scheduleTitleMid}</span>
+                {t.scheduleTitleTail}
               </h2>
               <p className="text-[#a89c9e] text-xs lg:text-sm tracking-[0.4em] mt-4 font-black uppercase">Whimsical Schedule</p>
             </div>
 
-            <h2 className="text-3xl font-black text-red-300 tracking-[0.2em] mb-8 text-center md:hidden flex flex-col items-center gap-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-red-300 tracking-[0.2em] mb-8 text-center xl:hidden flex flex-col items-center gap-2">
               <div className="flex items-end gap-1">
-                気まぐれ
-                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.7)] text-[1.25em] leading-none mt-[-0.1em]">配信</span>
+                {t.scheduleTitleLead}
+                <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.7)] text-[1.25em] leading-none mt-[-0.1em]">{t.scheduleTitleMid}</span>
               </div>
-              <div>スケジュール</div>
+              <div>{t.scheduleTitleTail}</div>
             </h2>
 
             {/* --- PC版表示 --- */}
-            <div className="relative w-full max-w-2xl h-[80vh] hidden md:flex flex-col items-center justify-center">
+            <div className="relative w-full max-w-2xl h-[80vh] hidden xl:flex flex-col items-center justify-center">
               <div className="flex gap-16 md:gap-24 mb-[-20px] relative z-10 w-full justify-center h-32">
-                <div className="absolute top-[-130px] left-[-10px]"><PawFinger date={scheduleList[0].date} title={scheduleList[0].title} rotate="-rotate-[20deg]" /></div>
-                <div className="absolute top-[-190px] left-[calc(50%-4.5rem)] md:left-[calc(50%-5rem)] z-10"><PawFinger date={scheduleList[1].date} title={scheduleList[1].title} rotate="rotate-0" /></div>
-                <div className="absolute top-[-130px] right-[-10px]"><PawFinger date={scheduleList[2].date} title={scheduleList[2].title} rotate="rotate-[20deg]" /></div>
+                <div className="absolute top-[-130px] left-[-10px]"><PawFinger date={fmtDate(scheduleList[0].date)} title={scheduleList[0].title} rotate="-rotate-[20deg]" /></div>
+                <div className="absolute top-[-190px] left-[calc(50%-4.5rem)] md:left-[calc(50%-5rem)] z-10"><PawFinger date={fmtDate(scheduleList[1].date)} title={scheduleList[1].title} rotate="rotate-0" /></div>
+                <div className="absolute top-[-130px] right-[-10px]"><PawFinger date={fmtDate(scheduleList[2].date)} title={scheduleList[2].title} rotate="rotate-[20deg]" /></div>
               </div>
               
               <motion.div 
@@ -1034,14 +1227,14 @@ export default function Home() {
                 onHoverEnd={() => setIsHoveringLink(false)}
               >
                 <div className="inline-block bg-red-500/20 text-red-300 text-xs font-black tracking-widest px-5 py-2 rounded-full mb-6 animate-pulse">NEXT LIVE</div>
-                <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">{nextLive.date}</span>
+                <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">{fmtDate(nextLive.date)}</span>
                 <span className="text-lg md:text-xl text-[#d1c5c7] font-bold border-t border-white/10 pt-6 w-3/4 text-center leading-relaxed whitespace-pre-wrap">{nextLive.title}</span>
               </motion.div>
               <div className="absolute bottom-[-2vh] left-[calc(50%-150px)] w-[300px] h-10 bg-black/30 rounded-[50%] blur-xl opacity-80 z-0"></div>
             </div>
 
-            {/* --- スマホ版表示 --- */}
-            <div className="w-full max-w-md mx-auto mt-12 md:hidden relative px-4">
+            {/* --- モバイル・タブレット版表示 --- */}
+            <div className="w-full max-w-md md:max-w-xl lg:max-w-2xl mx-auto mt-8 md:mt-4 xl:hidden relative px-2 sm:px-4">
               <div className="absolute left-[38px] top-4 bottom-0 w-[2px] bg-red-400/20"></div>
               
               {/* NEXT LIVE */}
@@ -1050,8 +1243,8 @@ export default function Home() {
                 <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-r from-red-500/10 to-[#544b4d]/80 border border-red-400/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute -right-4 -bottom-4 text-6xl opacity-5">🐾</div>
                   <span className="inline-block bg-red-500/20 text-red-300 text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">NEXT LIVE</span>
-                  <h3 className="text-2xl font-black text-[#f4ebeb] tracking-wider mb-2">{nextLive.date}</h3>
-                  <p className="text-sm text-[#d1c5c7] font-bold whitespace-pre-wrap">{nextLive.title}</p>
+                  <h3 className="text-2xl md:text-3xl font-black text-[#f4ebeb] tracking-wider mb-2">{fmtDate(nextLive.date)}</h3>
+                  <p className="text-sm md:text-base text-[#d1c5c7] font-bold whitespace-pre-wrap">{nextLive.title}</p>
                 </motion.div>
               </div>
               
@@ -1060,8 +1253,8 @@ export default function Home() {
                 <div key={i} className="relative pl-14 py-3">
                   <div className="absolute left-[33px] top-[1.8rem] w-3 h-3 bg-red-400/40 rounded-full border-2 border-[#453e40] z-10"></div>
                   <motion.div whileHover={{ scale: 1.05 }} className="bg-[#544b4d]/40 border border-white/5 rounded-xl p-4">
-                    <h3 className="text-base font-bold text-red-300 mb-1">{item.date}</h3>
-                    <p className="text-xs text-[#d1c5c7] font-medium whitespace-pre-wrap">{item.title}</p>
+                    <h3 className="text-base md:text-lg font-bold text-red-300 mb-1">{fmtDate(item.date)}</h3>
+                    <p className="text-xs md:text-sm text-[#d1c5c7] font-medium whitespace-pre-wrap">{item.title}</p>
                   </motion.div>
                 </div>
               ))}
@@ -1070,7 +1263,7 @@ export default function Home() {
 
           <motion.section 
             id="contact" 
-            className="px-6 md:pl-40 md:pr-24 lg:pl-48 lg:pr-40 py-10 md:py-12 mb-32 lg:mb-48 max-w-6xl mx-auto scroll-mt-24 relative hidden md:block overflow-visible"
+            className="px-6 xl:pl-40 xl:pr-24 2xl:pl-48 2xl:pr-40 py-10 xl:py-12 mb-32 lg:mb-48 max-w-6xl mx-auto scroll-mt-24 relative hidden xl:block overflow-visible"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -1082,7 +1275,7 @@ export default function Home() {
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              <ContactTapHint hidden={isTicketCut} />
+              <ContactTapHint hidden={isTicketCut} label={t.tap} />
 
               <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
@@ -1119,13 +1312,18 @@ export default function Home() {
               >
                 <div className="flex-1 flex items-end justify-center w-full pb-10">
                   <h2 className="text-3xl lg:text-5xl font-extrabold text-white tracking-wider drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] whitespace-pre-wrap group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,1)] transition-all duration-500">
-                    お仕事のご相談は<br />こちらへ🐾
+                    {t.contactTitle.split('\n').map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i === 0 && <br />}
+                      </span>
+                    ))}
                   </h2>
                 </div>
 
                 <div className="flex-1 flex flex-col items-center justify-start w-full pt-10">
                   <p className="text-lg lg:text-2xl text-[#c2b6b8] leading-loose mb-10 font-medium tracking-wide group-hover:drop-shadow-[0_0_8px_rgba(255,220,227,0.4)] transition-all duration-500">
-                    お仕事やコラボのご相談は<span className="font-bold text-[#ffdce3] drop-shadow-[0_0_10px_rgba(255,220,227,0.6)]">DM</span>にて承ってます🐾
+                    {t.contactBodyBefore}<span className="font-bold text-[#ffdce3] drop-shadow-[0_0_10px_rgba(255,220,227,0.6)]">DM</span>{t.contactBodyAfter}
                   </p>
                   
                   <motion.a 
@@ -1149,14 +1347,14 @@ export default function Home() {
 
           <motion.section 
             id="contact-mobile" 
-            className="px-6 pb-10 mb-32 lg:mb-48 max-w-md mx-auto scroll-mt-24 relative md:hidden overflow-visible"
+            className="px-4 sm:px-6 pb-10 mb-32 lg:mb-48 max-w-md md:max-w-2xl lg:max-w-3xl mx-auto scroll-mt-24 relative xl:hidden overflow-visible"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
             <motion.div 
-              className="relative w-full min-h-[50vh] cursor-pointer group overflow-visible"
+              className="relative w-full min-h-[50vh] md:min-h-[52vh] lg:min-h-[56vh] cursor-pointer group overflow-visible"
               onClick={handleCutTicket}
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
@@ -1190,22 +1388,27 @@ export default function Home() {
               </motion.div>
 
               <motion.div 
-                className="absolute inset-0 p-8 flex flex-col justify-between items-center text-center z-30 pointer-events-auto"
+                className="absolute inset-0 p-6 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between items-center text-center z-30 pointer-events-auto"
                 animate={isTicketCut ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
               >
                 <div className="flex-1 flex flex-col justify-end items-center w-full pb-4">
-                  <h2 className="text-2xl font-extrabold text-white tracking-wider drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] mb-4">
-                    お仕事のご相談は<br />こちらへ🐾
+                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-white tracking-wider drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] mb-4">
+                    {t.contactTitle.split('\n').map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i === 0 && <br />}
+                      </span>
+                    ))}
                   </h2>
-                  <p className="text-base text-[#c2b6b8] font-medium tracking-wide">
-                    お仕事やコラボのご相談は
+                  <p className="text-sm sm:text-base md:text-lg text-[#c2b6b8] font-medium tracking-wide">
+                    {t.contactBodyBefore}
                   </p>
                 </div>
 
                 <div className="flex-1 flex flex-col justify-start items-center w-full pt-4">
-                  <p className="text-base text-[#c2b6b8] font-medium tracking-wide mb-6">
-                    <span className="font-bold text-[#ffdce3]">DM</span>にて承ってます🐾
+                  <p className="text-sm sm:text-base md:text-lg text-[#c2b6b8] font-medium tracking-wide mb-6">
+                    <span className="font-bold text-[#ffdce3]">DM</span>{t.contactBodyAfter}
                   </p>
                   <motion.a 
                     href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
@@ -1213,7 +1416,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     whileHover={{ scale: 1.05 }}
-                    className="flex items-center justify-center gap-4 py-5 px-12 bg-red-400 text-white text-base font-bold tracking-wide rounded-full shadow-lg hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40 mx-auto"
+                    className="flex items-center justify-center gap-3 md:gap-4 py-4 sm:py-5 md:py-6 px-8 sm:px-12 md:px-16 bg-red-400 text-white text-sm sm:text-base md:text-lg font-bold tracking-wide rounded-full shadow-lg hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40 mx-auto"
                     onHoverStart={() => setIsHoveringLink(true)}
                     onHoverEnd={() => setIsHoveringLink(false)}
                   >
@@ -1226,15 +1429,15 @@ export default function Home() {
             </motion.div>
           </motion.section>
 
-          <section className="px-6 md:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto text-center border-t border-white/10 pt-20 relative z-10 scroll-mt-24">
-            <h2 className="text-sm lg:text-base font-bold text-[#c2b6b8] mb-6 tracking-widest">二次創作・ガイドラインについて</h2>
+          <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto text-center border-t border-white/10 pt-20 relative z-10 scroll-mt-24">
+            <h2 className="text-sm lg:text-base font-bold text-[#c2b6b8] mb-6 tracking-widest">{t.guidelineTitle}</h2>
             <p className="text-xs lg:text-sm text-[#a89c9e] leading-relaxed max-w-3xl mx-auto font-medium">
-              ファンアートや切り抜き動画の制作は原則大歓迎です！制作の際は、他の方の迷惑にならない範囲で、愛を持って楽しんでいただけると嬉しいです。（※センシティブな内容や、公式と誤認されるような表現はお控えください）
+              {t.guidelineBody}
             </p>
           </section>
 
           <footer className="py-20 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
-            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-4 md:gap-8 max-w-[340px] md:max-w-none mx-auto mb-16">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 sm:gap-4 md:gap-8 max-w-[340px] sm:max-w-[380px] md:max-w-none mx-auto mb-16">
               {snsLinks.map((sns) => (
                 <a 
                   key={`footer-${sns.n}`} 
@@ -1257,7 +1460,7 @@ export default function Home() {
               </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
-                サイト制作🐾: <span className="text-white/80">"火日"</span>
+                {t.siteCredit}: <span className="text-white/80">"火日"</span>
               </p>
             </div>
 

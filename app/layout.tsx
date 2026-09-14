@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { M_PLUS_Rounded_1c } from "next/font/google";
 import { isSiteReleased, PRE_RELEASE_SITE_TITLE } from "@/lib/site-release";
 import "./globals.css";
@@ -65,6 +65,11 @@ const preReleaseMetadata: Metadata = {
     creator: "@h_neko20",
     images: ["https://nekohami-gururu.com/ogp.png"],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export const metadata: Metadata = isSiteReleased() ? releasedMetadata : preReleaseMetadata;
