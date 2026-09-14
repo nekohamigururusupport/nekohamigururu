@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type CSSProperties, type ReactNode, type MouseEvent } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
@@ -93,6 +93,19 @@ const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left:
   </motion.div>
 );
 
+const NAME_NEKO_STYLE: CSSProperties = {
+  WebkitTextStroke: '0.014em rgba(255,255,255,0.28)',
+  paintOrder: 'stroke fill',
+};
+
+const NAME_GURU_STYLE: CSSProperties = {
+  WebkitTextStroke: '0.028em #ffdce3',
+  paintOrder: 'stroke fill',
+};
+
+const NAME_NEKO_CLASS = 'text-[#E7E4DC] drop-shadow-[0_0_3px_rgba(231,228,220,0.35)]';
+const NAME_GURU_CLASS = 'text-[#7A3038] drop-shadow-[0_0_4px_rgba(255,220,227,0.4)]';
+
 // 🐾 オープニング画面コンポーネント（公開後のみ名前表示）
 const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showName: boolean }) => {
   useEffect(() => {
@@ -128,20 +141,14 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
             {chars.map((char, i) => (
             <motion.span
               key={i}
-              className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black ${
-                i < 2 ? 'text-[#f4ebeb]' : 'text-red-400'
-              }`}
-              style={{
-                filter:
-                  i < 2
-                    ? 'drop-shadow(0 0 8px rgba(244,114,182,0.2))'
-                    : 'drop-shadow(0 0 5px #f472b6) drop-shadow(0 0 15px #f472b6)',
-              }}
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black"
               initial={{ opacity: 0, x: -50, filter: 'blur(10px)' }}
               animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
               transition={{ delay: 0.5 + i * 0.12, duration: 0.6, type: 'spring', stiffness: 100 }}
             >
-              {char}
+              <span className={i < 2 ? NAME_NEKO_CLASS : NAME_GURU_CLASS} style={i < 2 ? NAME_NEKO_STYLE : NAME_GURU_STYLE}>
+                {char}
+              </span>
             </motion.span>
             ))}
           </div>
@@ -165,6 +172,25 @@ const GlassPawBG = ({ className }: { className: string }) => (
   </div>
 );
 
+const ACCENT_STROKE: CSSProperties = {
+  WebkitTextStroke: '0.8px #fff4f6',
+  paintOrder: 'stroke fill',
+};
+
+const AccentText = ({
+  children,
+  className = '',
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <span className={`text-[#e24e5f] ${className}`} style={ACCENT_STROKE}>
+    {children}
+  </span>
+);
+
+const isUndecidedLabel = (value: string) => /未定|TBD|미정/.test(value);
+
 // PC用スケジュールパーツ
 const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotate: string }) => (
   <motion.div 
@@ -173,9 +199,24 @@ const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotat
     className={`relative w-32 h-32 md:w-40 md:h-40 bg-[#544b4d]/80 backdrop-blur-md border border-white/10 rounded-[50%_50%_40%_40%] ${rotate} shadow-lg flex flex-col items-center justify-center p-4 transition-all duration-300 hover:-translate-y-4 cursor-pointer group`}
   >
     <div className="absolute top-[-22%] left-[calc(50%-10px)] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[18px] border-b-red-400 opacity-80 z-[-1] transition-transform duration-300 group-hover:scale-110"></div>
-    <span className="text-sm md:text-base font-bold text-red-300">{date}</span>
+    {isUndecidedLabel(date) ? (
+      <AccentText className="text-sm md:text-base font-bold">{date}</AccentText>
+    ) : (
+      <span className="text-sm md:text-base font-bold text-red-300">{date}</span>
+    )}
             <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium whitespace-pre-wrap">{title}</span>
   </motion.div>
+);
+
+const SiteName = () => (
+  <>
+    <span className={NAME_NEKO_CLASS} style={NAME_NEKO_STYLE}>
+      猫喰
+    </span>
+    <span className={NAME_GURU_CLASS} style={NAME_GURU_STYLE}>
+      ぐるる
+    </span>
+  </>
 );
 
 const menuPawParticles = [
@@ -223,7 +264,7 @@ const LanguageSwitcher = ({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full border-2 border-red-400/50 bg-[#3a3335] text-[#f4ebeb] text-[10px] sm:text-xs md:text-sm font-black tracking-wider hover:border-red-300 hover:text-red-300 transition-all shadow-[0_0_12px_rgba(248,113,113,0.25)]"
+        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full border-2 border-red-400/50 bg-[#3a3335] text-[#E7E4DC] text-[10px] sm:text-xs md:text-sm font-black tracking-wider hover:border-red-300 hover:text-red-300 transition-all shadow-[0_0_12px_rgba(248,113,113,0.25)]"
         aria-expanded={open}
         aria-haspopup="listbox"
       >
@@ -260,7 +301,7 @@ const LanguageSwitcher = ({
                 className={`w-full px-4 py-3 text-sm font-bold tracking-wide transition-colors flex items-center gap-2 ${
                   opt.id === lang
                     ? 'bg-red-400/20 text-red-300'
-                    : 'text-[#f4ebeb] hover:bg-white/10 hover:text-red-200'
+                    : 'text-[#E7E4DC] hover:bg-white/10 hover:text-red-200'
                 }`}
               >
                 <span className="text-[10px] opacity-60">{opt.short}</span>
@@ -275,7 +316,15 @@ const LanguageSwitcher = ({
   );
 };
 
-const ContactTapHint = ({ hidden, label }: { hidden: boolean; label: string }) => {
+const ContactTapHint = ({
+  hidden,
+  label,
+  onTap,
+}: {
+  hidden: boolean;
+  label: string;
+  onTap: () => void;
+}) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -291,16 +340,30 @@ const ContactTapHint = ({ hidden, label }: { hidden: boolean; label: string }) =
     <AnimatePresence>
       {!hidden && (
         <motion.div
-          className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[calc(100%+2.7rem)] pointer-events-none select-none z-[35] hidden xl:block"
+          className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[calc(100%+2.7rem)] pointer-events-auto cursor-pointer select-none z-[40] hidden xl:block"
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -8 }}
           transition={{ duration: 0.35 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onTap();
+          }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              onTap();
+            }
+          }}
         >
           <motion.div
             className={`flex items-center gap-4 px-7 py-4 ${hintBoxClass}`}
             animate={{ opacity: [0.85, 1, 0.85], x: [0, 11, 0] }}
             transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+            whileTap={{ scale: 0.96 }}
           >
             <span className="text-[1.8rem] lg:text-[2rem] font-bold tracking-[0.14em] text-[#ffe8ec] drop-shadow-[0_0_10px_rgba(255,200,210,0.65)] whitespace-nowrap">
               {label}
@@ -319,7 +382,7 @@ const ContactTapHint = ({ hidden, label }: { hidden: boolean; label: string }) =
   );
 };
 
-const TWITCASTING_SCREEN_ID = 'h_neko20';
+const TWITTER_DM_URL = 'https://twitter.com/messages/compose?recipient_id=2005495955274219520';
 
 const LiveStreamThumbnail = ({ primarySrc }: { primarySrc: string }) => {
   const [src, setSrc] = useState(primarySrc);
@@ -372,6 +435,7 @@ export default function Home() {
   
   const [isTicketCut, setIsTicketCut] = useState(false);
   const cutTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const sendTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // マウス位置取得用
   const mouseX = useMotionValue(0);
@@ -404,44 +468,47 @@ export default function Home() {
     { date: "未定🐾", title: "COMING SOON" }
   ]);
 
-  // ✅ カレンダー取得Effect（裏口経由で安全に！）
+  const [schedulePulse, setSchedulePulse] = useState(0);
+
   useEffect(() => {
+    let cancelled = false;
+    const fallback = Array(4).fill({ date: "未定🐾", title: "COMING SOON" });
+    let hasLoaded = false;
+    let lastStamp = '';
+
     const fetchCalendar = async () => {
       try {
-        const res = await fetch('/api/calendar');
-        
-        // ▼ 修正：throw new Error をやめて、静かにCOMING SOONを表示させる！ ▼
+        const res = await fetch(`/api/calendar?t=${Date.now()}`, { cache: 'no-store' });
+
         if (!res.ok) {
-          console.warn('裏口(API)が鍵を見つけられなかったぜ！COMING SOONを表示するぞ！');
-          const fallback = Array(4).fill({ date: "未定🐾", title: "COMING SOON" });
-          setNextLive(fallback[0]);
-          setScheduleList(fallback.slice(1, 4));
+          if (!hasLoaded && !cancelled) {
+            setNextLive(fallback[0]);
+            setScheduleList(fallback.slice(1, 4));
+          }
           return;
         }
-        // ▲ 修正ここまで ▲
 
         const data = await res.json();
-
         let formattedEvents: { date: string, title: string }[] = [];
 
         if (data.items && data.items.length > 0) {
-          formattedEvents = data.items.map((event: any) => {
-            const dateObj = new Date(event.start.dateTime || event.start.date);
+          formattedEvents = data.items.map((event: { start?: { dateTime?: string; date?: string }; summary?: string }) => {
+            const dateObj = new Date(event.start?.dateTime || event.start?.date || '');
             const month = dateObj.getMonth() + 1;
             const day = dateObj.getDate();
             const days = ['日', '月', '火', '水', '木', '金', '土'];
             const dayOfWeek = days[dateObj.getDay()];
 
             let timeString = '';
-            if (event.start.dateTime) {
+            if (event.start?.dateTime) {
               const hours = dateObj.getHours();
               const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-              timeString = `${hours}:${minutes}〜\n`; 
+              timeString = `${hours}:${minutes}〜\n`;
             }
 
             return {
               date: `${month}/${day} (${dayOfWeek})`,
-              title: `${timeString}${event.summary || '秘密の予定🐾'}`
+              title: `${timeString}${event.summary || '秘密の予定🐾'}`,
             };
           });
         }
@@ -449,22 +516,38 @@ export default function Home() {
         while (formattedEvents.length < 4) {
           formattedEvents.push({
             date: "未定🐾",
-            title: "COMING SOON"
+            title: "COMING SOON",
           });
         }
 
+        if (cancelled) return;
+        hasLoaded = true;
+        const stamp = JSON.stringify(formattedEvents);
+        const changed = stamp !== lastStamp;
+        if (changed && lastStamp !== '') setSchedulePulse((n) => n + 1);
+        lastStamp = stamp;
         setNextLive(formattedEvents[0]);
         setScheduleList(formattedEvents.slice(1, 4));
-
       } catch (error) {
         console.error('カレンダーの取得に失敗したぜ:', error);
-        const fallback = Array(4).fill({ date: "未定🐾", title: "COMING SOON" });
-        setNextLive(fallback[0]);
-        setScheduleList(fallback.slice(1, 4));
+        if (!hasLoaded && !cancelled) {
+          setNextLive(fallback[0]);
+          setScheduleList(fallback.slice(1, 4));
+        }
       }
     };
 
     fetchCalendar();
+    const timer = window.setInterval(fetchCalendar, 5 * 60 * 1000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') fetchCalendar();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, []);
 
   const snsLinks = [
@@ -552,14 +635,38 @@ export default function Home() {
   }, [lang]);
 
   const handleCutTicket = () => {
-    if (!isTicketCut) {
+    if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
+    const play = () => {
       setIsTicketCut(true);
-      if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
       cutTimeoutRef.current = setTimeout(() => {
         setIsTicketCut(false);
-      }, 1500); 
+      }, 1500);
+    };
+    if (isTicketCut) {
+      setIsTicketCut(false);
+      cutTimeoutRef.current = setTimeout(play, 40);
+      return;
     }
+    play();
   };
+
+  const handleSendMessage = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.stopPropagation();
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    handleCutTicket();
+    if (sendTimeoutRef.current) clearTimeout(sendTimeoutRef.current);
+    sendTimeoutRef.current = setTimeout(() => {
+      window.open(TWITTER_DM_URL, '_blank', 'noopener,noreferrer');
+    }, 750);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
+      if (sendTimeoutRef.current) clearTimeout(sendTimeoutRef.current);
+    };
+  }, []);
 
   // ==========================================
   // 公開フラグ — デビュー時: NEXT_PUBLIC_SITE_RELEASED=true（本番）
@@ -684,13 +791,13 @@ export default function Home() {
           <header className="fixed top-0 w-full h-16 bg-[#453e40]/90 backdrop-blur-sm border-b border-white/10 z-[60] flex items-center justify-between px-4 sm:px-6 md:px-10 xl:px-16 shadow-sm overflow-visible">
             <div className="flex items-center gap-2">
               <span className="text-2xl opacity-80">🐾</span>
-              <div className="text-[#f4ebeb] font-bold text-sm sm:text-base tracking-[0.1em] cursor-default">
-                猫喰<span className="text-red-300 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
+              <div className="font-bold text-sm sm:text-base tracking-[0.1em] cursor-default">
+                <SiteName />
               </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4 xl:gap-6">
-            <nav className="hidden xl:flex gap-5 2xl:gap-10 text-[17px] 2xl:text-[20px] tracking-wide text-[#d1c5c7] font-bold">
+            <nav className="hidden xl:flex gap-5 2xl:gap-10 text-[17px] 2xl:text-[20px] tracking-wide text-[#E7E4DC] font-bold">
               {navItems.map((item) => (
                 <motion.a 
                   key={item.key} 
@@ -703,7 +810,7 @@ export default function Home() {
             </nav>
             <LanguageSwitcher lang={lang} onChange={setLang} />
             <button 
-              className="xl:hidden text-[#f4ebeb] p-2 focus:outline-none"
+              className="xl:hidden text-[#E7E4DC] p-2 focus:outline-none"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -753,7 +860,7 @@ export default function Home() {
                     key={item.key} 
                     href={item.mobileHref ?? item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="text-[#f4ebeb] font-bold text-sm md:text-base lg:text-lg tracking-[0.2em] hover:text-red-300 transition-colors relative z-10"
+                    className="text-[#E7E4DC] font-bold text-sm md:text-base lg:text-lg tracking-[0.2em] hover:text-red-300 transition-colors relative z-10"
                   >
                     {t.nav[item.key]}
                   </a>
@@ -767,22 +874,22 @@ export default function Home() {
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[12px] sm:text-[13px] md:text-[16px] lg:text-[18px] xl:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
                 {t.fvBadge}
               </div>
-              <h1 className="text-[32px] sm:text-[36px] md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-9xl font-black text-[#f4ebeb] tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.2em] xl:tracking-[15px] leading-tight whitespace-nowrap ml-[6px] sm:ml-[10px] md:ml-[16px] xl:ml-[20px]">
-                猫喰<span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.4)]">ぐるる</span>
+              <h1 className="text-[32px] sm:text-[36px] md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-9xl font-black tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.2em] xl:tracking-[15px] leading-tight whitespace-nowrap ml-[6px] sm:ml-[10px] md:ml-[16px] xl:ml-[20px]">
+                <SiteName />
               </h1>
               
-              <p className="text-[#c2b6b8] text-[9px] sm:text-[10px] md:text-[11px] lg:text-sm xl:text-[21px] tracking-[0.55em] sm:tracking-[0.7em] md:tracking-[0.35em] lg:tracking-[0.4em] xl:tracking-[1em] mt-2 font-bold uppercase whitespace-nowrap lg:ml-[20px] xl:ml-[30px]">
+              <p className="text-[#E7E4DC] text-[9px] sm:text-[10px] md:text-[11px] lg:text-sm xl:text-[21px] tracking-[0.55em] sm:tracking-[0.7em] md:tracking-[0.35em] lg:tracking-[0.4em] xl:tracking-[1em] mt-2 font-bold uppercase whitespace-nowrap lg:ml-[20px] xl:ml-[30px]">
                 NEKOHAMI GURURU
               </p>
 
               {/* ========================================== */}
               {/* ▼ PC用サブタイトル（1280px以上） ▼ */}
               {/* ========================================== */}
-              <div className={`hidden xl:flex items-center justify-start mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full ${lang === 'ja' ? 'whitespace-nowrap' : 'flex-wrap'}`}>
-                <span className={`text-[28px] 2xl:text-[40px] ${lang === 'ja' ? '' : 'whitespace-normal'}`}>{t.fvSubLead}</span>
+              <div className={`hidden xl:flex items-center justify-start mt-6 mb-2 font-bold tracking-widest w-full ${lang === 'ja' ? 'whitespace-nowrap' : 'flex-wrap'}`}>
+                <AccentText className={`text-[28px] 2xl:text-[40px] ${lang === 'ja' ? '' : 'whitespace-normal'}`}>{t.fvSubLead}</AccentText>
                 <span className="flex flex-row items-center mx-3 whitespace-nowrap">
                   <span className="text-[24px] 2xl:text-[30px] opacity-90 tracking-normal">🐈‍⬛</span>
-                  <span className="text-[28px] 2xl:text-[40px] mx-3">{t.fvSubRole}</span>
+                  <AccentText className="text-[28px] 2xl:text-[40px] mx-3">{t.fvSubRole}</AccentText>
                   <span className="text-[24px] 2xl:text-[30px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
@@ -790,11 +897,11 @@ export default function Home() {
               {/* ========================================== */}
               {/* ▼ モバイル・タブレット用サブタイトル ▼ */}
               {/* ========================================== */}
-              <div className="flex xl:hidden flex-col items-center md:items-start justify-center mt-6 mb-2 text-[#ffdce3] font-bold tracking-widest drop-shadow-[0_0_12px_rgba(244,114,182,0.6)] w-full">
-                <span className={`text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] ${lang === 'ja' ? 'whitespace-nowrap' : 'whitespace-normal text-center md:text-left'}`}>{t.fvSubLead}</span>
+              <div className="flex xl:hidden flex-col items-center md:items-start justify-center mt-6 mb-2 font-bold tracking-widest w-full">
+                <AccentText className={`text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] ${lang === 'ja' ? 'whitespace-nowrap' : 'whitespace-normal text-center md:text-left'}`}>{t.fvSubLead}</AccentText>
                 <span className="flex flex-row items-center mt-2 whitespace-nowrap">
                   <span className="text-[15px] sm:text-[16px] md:text-[20px] lg:text-[24px] opacity-90 tracking-normal">🐈‍⬛</span>
-                  <span className="text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] mx-2">{t.fvSubRole}</span>
+                  <AccentText className="text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] mx-2">{t.fvSubRole}</AccentText>
                   <span className="text-[15px] sm:text-[16px] md:text-[20px] lg:text-[24px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
@@ -934,8 +1041,8 @@ export default function Home() {
           >
             <div className="bg-[#544b4d] rounded-[2.5rem] md:rounded-[4rem] px-6 sm:px-8 pt-10 pb-10 md:p-12 lg:p-16 xl:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center">
               <div className="absolute top-10 right-10 text-9xl opacity-[0.01] rotate-12">🐾</div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-red-300 mb-10 md:mb-16 flex items-center gap-4 tracking-widest drop-shadow-sm">
-                <span className="text-red-400 opacity-50">🐾</span> {t.profileTitle}
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-10 md:mb-16 flex items-center gap-4 tracking-widest">
+                <span className="text-red-400 opacity-50">🐾</span> <AccentText>{t.profileTitle}</AccentText>
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-10 items-center w-full">
                 <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16px] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
@@ -993,7 +1100,7 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#e8dbdd] mb-12 tracking-widest text-center">OFFICIAL TAGS</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#E7E4DC] mb-12 tracking-widest text-center">OFFICIAL TAGS</h2>
             <div className="flex flex-col md:flex-row justify-center gap-8">
               {[
                 // TODO: 総合タグは仮置き。配信で募集して決める可能性あり。
@@ -1011,8 +1118,8 @@ export default function Home() {
                   onHoverEnd={() => setIsHoveringLink(false)}
                 >
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                  <p className="text-sm lg:text-base text-red-300/80 mb-4 font-black">{t.label}</p>
-                  <p className="text-2xl lg:text-3xl font-black text-[#f4ebeb] tracking-wider group-hover:text-red-300 transition-colors">{t.tag}</p>
+                  <p className="text-sm lg:text-base mb-4 font-black"><AccentText>{t.label}</AccentText></p>
+                  <p className="text-2xl lg:text-3xl font-black text-[#E7E4DC] tracking-wider group-hover:text-red-300 transition-colors">{t.tag}</p>
                   <div className="mt-6 text-xs text-gray-400 animate-pulse">{t.tagSearch}</div>
                 </motion.a>
               ))}
@@ -1027,7 +1134,7 @@ export default function Home() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true, amount: 0.3 }}
           >
-            <h2 className="text-2xl lg:text-4xl font-black text-[#f4ebeb] mb-16 tracking-tight drop-shadow-sm">LISTEN MUSIC</h2>
+            <h2 className="text-2xl lg:text-4xl font-black text-[#E7E4DC] mb-16 tracking-tight drop-shadow-sm">LISTEN MUSIC</h2>
             <motion.div
               className="w-full group"
               onHoverStart={() => setIsHoveringLink(true)}
@@ -1059,7 +1166,8 @@ export default function Home() {
                   <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 lg:gap-8">
                     <span className="text-xl sm:text-2xl md:text-4xl lg:text-5xl drop-shadow-[0_0_10px_rgba(255,220,227,0.45)] shrink-0">🐈‍⬛</span>
                     <motion.p
-                      className="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-red-300 font-black tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.22em] lg:tracking-[0.28em] xl:tracking-[0.35em] drop-shadow-[0_0_10px_rgba(248,113,113,0.65)] whitespace-nowrap"
+                      className="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl text-[#e24e5f] font-black tracking-[0.08em] sm:tracking-[0.12em] md:tracking-[0.22em] lg:tracking-[0.28em] xl:tracking-[0.35em] whitespace-nowrap"
+                      style={ACCENT_STROKE}
                       animate={{ rotate: [-1.4, 1.4, -1.4], y: [0, -3, 0] }}
                       transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
                     >
@@ -1122,7 +1230,7 @@ export default function Home() {
                 >
                   <FaPaw />
                 </motion.div>
-                <h2 className={`text-lg sm:text-xl md:text-3xl lg:text-4xl font-black text-[#f4ebeb] mb-0 tracking-widest drop-shadow-sm flex items-center justify-center gap-2 px-2 ${lang === 'ja' ? 'whitespace-nowrap' : 'text-center'}`}>
+                <h2 className={`text-lg sm:text-xl md:text-3xl lg:text-4xl font-black text-[#E7E4DC] mb-0 tracking-widest drop-shadow-sm flex items-center justify-center gap-2 px-2 ${lang === 'ja' ? 'whitespace-nowrap' : 'text-center'}`}>
                   {t.mashTitle}
                 </h2>
               </div>
@@ -1194,21 +1302,25 @@ export default function Home() {
           </section>
 
           <section id="schedule" className="px-4 sm:px-6 md:px-12 lg:px-24 xl:px-40 mb-32 lg:mb-48 max-w-7xl mx-auto flex flex-col items-center scroll-mt-24">
+            <motion.div
+              className="w-full flex flex-col items-center"
+              animate={schedulePulse > 0 ? { opacity: [0.45, 1] } : { opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
             <div className="text-center mb-8 relative hidden xl:block">
-              <h2 className="text-3xl lg:text-5xl font-black text-red-300 tracking-[0.2em] drop-shadow-[0_0_8px_rgba(248,113,113,0.4)] flex items-center justify-center gap-2">
-                {t.scheduleTitleLead}
+              <h2 className="text-3xl lg:text-5xl font-black tracking-[0.2em] flex items-center justify-center gap-2">
+                <AccentText>{t.scheduleTitleLead}</AccentText>
                 <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] text-[1.2em] leading-none mt-[-0.1em]">{t.scheduleTitleMid}</span>
-                {t.scheduleTitleTail}
+                <AccentText>{t.scheduleTitleTail}</AccentText>
               </h2>
-              <p className="text-[#a89c9e] text-xs lg:text-sm tracking-[0.4em] mt-4 font-black uppercase">Whimsical Schedule</p>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black text-red-300 tracking-[0.2em] mb-8 text-center xl:hidden flex flex-col items-center gap-2">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-[0.2em] mb-8 text-center xl:hidden flex flex-col items-center gap-2">
               <div className="flex items-end gap-1">
-                {t.scheduleTitleLead}
+                <AccentText>{t.scheduleTitleLead}</AccentText>
                 <span className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.7)] text-[1.25em] leading-none mt-[-0.1em]">{t.scheduleTitleMid}</span>
               </div>
-              <div>{t.scheduleTitleTail}</div>
+              <AccentText>{t.scheduleTitleTail}</AccentText>
             </h2>
 
             {/* --- PC版表示 --- */}
@@ -1227,7 +1339,11 @@ export default function Home() {
                 onHoverEnd={() => setIsHoveringLink(false)}
               >
                 <div className="inline-block bg-red-500/20 text-red-300 text-xs font-black tracking-widest px-5 py-2 rounded-full mb-6 animate-pulse">NEXT LIVE</div>
-                <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">{fmtDate(nextLive.date)}</span>
+                {isUndecidedLabel(fmtDate(nextLive.date)) ? (
+                  <AccentText className="text-4xl md:text-5xl font-black mb-6 tracking-wider">{fmtDate(nextLive.date)}</AccentText>
+                ) : (
+                  <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">{fmtDate(nextLive.date)}</span>
+                )}
                 <span className="text-lg md:text-xl text-[#d1c5c7] font-bold border-t border-white/10 pt-6 w-3/4 text-center leading-relaxed whitespace-pre-wrap">{nextLive.title}</span>
               </motion.div>
               <div className="absolute bottom-[-2vh] left-[calc(50%-150px)] w-[300px] h-10 bg-black/30 rounded-[50%] blur-xl opacity-80 z-0"></div>
@@ -1243,7 +1359,13 @@ export default function Home() {
                 <motion.div whileHover={{ scale: 1.05 }} className="bg-gradient-to-r from-red-500/10 to-[#544b4d]/80 border border-red-400/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
                   <div className="absolute -right-4 -bottom-4 text-6xl opacity-5">🐾</div>
                   <span className="inline-block bg-red-500/20 text-red-300 text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-3 animate-pulse">NEXT LIVE</span>
-                  <h3 className="text-2xl md:text-3xl font-black text-[#f4ebeb] tracking-wider mb-2">{fmtDate(nextLive.date)}</h3>
+                  <h3 className="text-2xl md:text-3xl font-black tracking-wider mb-2">
+                    {isUndecidedLabel(fmtDate(nextLive.date)) ? (
+                      <AccentText>{fmtDate(nextLive.date)}</AccentText>
+                    ) : (
+                      <span className="text-[#f4ebeb]">{fmtDate(nextLive.date)}</span>
+                    )}
+                  </h3>
                   <p className="text-sm md:text-base text-[#d1c5c7] font-bold whitespace-pre-wrap">{nextLive.title}</p>
                 </motion.div>
               </div>
@@ -1253,12 +1375,19 @@ export default function Home() {
                 <div key={i} className="relative pl-14 py-3">
                   <div className="absolute left-[33px] top-[1.8rem] w-3 h-3 bg-red-400/40 rounded-full border-2 border-[#453e40] z-10"></div>
                   <motion.div whileHover={{ scale: 1.05 }} className="bg-[#544b4d]/40 border border-white/5 rounded-xl p-4">
-                    <h3 className="text-base md:text-lg font-bold text-red-300 mb-1">{fmtDate(item.date)}</h3>
+                    <h3 className="text-base md:text-lg font-bold mb-1">
+                      {isUndecidedLabel(fmtDate(item.date)) ? (
+                        <AccentText>{fmtDate(item.date)}</AccentText>
+                      ) : (
+                        <span className="text-red-300">{fmtDate(item.date)}</span>
+                      )}
+                    </h3>
                     <p className="text-xs md:text-sm text-[#d1c5c7] font-medium whitespace-pre-wrap">{item.title}</p>
                   </motion.div>
                 </div>
               ))}
             </div>
+            </motion.div>
           </section>
 
           <motion.section 
@@ -1275,7 +1404,7 @@ export default function Home() {
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              <ContactTapHint hidden={isTicketCut} label={t.tap} />
+              <ContactTapHint hidden={false} label={t.tap} onTap={handleCutTicket} />
 
               <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
@@ -1323,14 +1452,14 @@ export default function Home() {
 
                 <div className="flex-1 flex flex-col items-center justify-start w-full pt-10">
                   <p className="text-lg lg:text-2xl text-[#c2b6b8] leading-loose mb-10 font-medium tracking-wide group-hover:drop-shadow-[0_0_8px_rgba(255,220,227,0.4)] transition-all duration-500">
-                    {t.contactBodyBefore}<span className="font-bold text-[#ffdce3] drop-shadow-[0_0_10px_rgba(255,220,227,0.6)]">DM</span>{t.contactBodyAfter}
+                    {t.contactBodyBefore}<span className="font-bold text-[#ffdce3] drop-shadow-[0_0_10px_rgba(255,220,227,0.6)]">DM</span>{t.contactBodyAfter} <span className="tracking-normal">🐈‍⬛⛓️</span>
                   </p>
                   
                   <motion.a 
-                    href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
+                    href={TWITTER_DM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={handleSendMessage}
                     whileHover={{ scale: 1.05 }}
                     className="flex items-center justify-center gap-4 py-6 px-16 bg-red-400 text-white text-lg lg:text-xl font-bold tracking-wide rounded-full shadow-lg group-hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] group-hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40"
                     onHoverStart={() => setIsHoveringLink(true)}
@@ -1408,13 +1537,13 @@ export default function Home() {
 
                 <div className="flex-1 flex flex-col justify-start items-center w-full pt-4">
                   <p className="text-sm sm:text-base md:text-lg text-[#c2b6b8] font-medium tracking-wide mb-6">
-                    <span className="font-bold text-[#ffdce3]">DM</span>{t.contactBodyAfter}
+                    <span className="font-bold text-[#ffdce3]">DM</span>{t.contactBodyAfter} <span className="tracking-normal">🐈‍⬛⛓️</span>
                   </p>
                   <motion.a 
-                    href="https://twitter.com/messages/compose?recipient_id=2005495955274219520"
+                    href={TWITTER_DM_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={handleSendMessage}
                     whileHover={{ scale: 1.05 }}
                     className="flex items-center justify-center gap-3 md:gap-4 py-4 sm:py-5 md:py-6 px-8 sm:px-12 md:px-16 bg-red-400 text-white text-sm sm:text-base md:text-lg font-bold tracking-wide rounded-full shadow-lg hover:shadow-[0_0_30px_rgba(248,113,113,0.8)] hover:bg-red-500 transition-all duration-300 transform group/btn relative overflow-hidden active:scale-95 z-40 mx-auto"
                     onHoverStart={() => setIsHoveringLink(true)}
@@ -1430,7 +1559,7 @@ export default function Home() {
           </motion.section>
 
           <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto text-center border-t border-white/10 pt-20 relative z-10 scroll-mt-24">
-            <h2 className="text-sm lg:text-base font-bold text-[#c2b6b8] mb-6 tracking-widest">{t.guidelineTitle}</h2>
+            <h2 className="text-sm lg:text-base font-bold text-[#E7E4DC] mb-6 tracking-widest">{t.guidelineTitle}</h2>
             <p className="text-xs lg:text-sm text-[#a89c9e] leading-relaxed max-w-3xl mx-auto font-medium">
               {t.guidelineBody}
             </p>
@@ -1455,8 +1584,8 @@ export default function Home() {
             </div>
 
             <div className="mb-12 flex flex-col items-center gap-6">
-              <div className="text-[#f4ebeb] text-3xl lg:text-4xl italic font-black select-none tracking-widest drop-shadow-md cursor-default">
-                猫喰<span className="text-red-400 drop-shadow-[0_0_5px_rgba(248,113,113,0.3)]">ぐるる</span>
+              <div className="text-3xl lg:text-4xl italic font-black select-none tracking-widest cursor-default">
+                <SiteName />
               </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
@@ -1464,7 +1593,7 @@ export default function Home() {
               </p>
             </div>
 
-            <p className="text-[11px] text-[#8e8184] mb-2 tracking-[0.3em] font-medium">© 2026 猫喰ぐるる / Nekohami Gururu</p>
+            <p className="text-[11px] text-[#E7E4DC] mb-2 tracking-[0.3em] font-medium">© 2026 猫喰ぐるる / Nekohami Gururu</p>
             <div className="w-10 h-[2px] bg-red-400/20 mx-auto mt-4"></div>
           </footer>
 
