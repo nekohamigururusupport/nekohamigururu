@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, type CSSProperties, type ReactNode, type MouseEvent } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, type MotionValue } from 'framer-motion';
 import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 import { isSiteReleased } from '@/lib/site-release';
@@ -162,13 +162,156 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
 
 // 既存の背景パーツ
 const GlassPawBG = ({ className }: { className: string }) => (
-  <div className={`absolute ${className} opacity-30 pointer-events-none`}>
-    <div className="relative w-full h-full">
-      <div className="absolute top-[10%] left-[15%] w-[20%] h-[25%] bg-white/5 backdrop-blur-md border border-white/10 rounded-[50%_50%_40%_40%] -rotate-[25deg]"></div>
-      <div className="absolute top-[0%] left-[40%] w-[20%] h-[25%] bg-white/5 backdrop-blur-md border border-white/10 rounded-[50%_50%_40%_40%]"></div>
-      <div className="absolute top-[10%] right-[15%] w-[20%] h-[25%] bg-white/5 backdrop-blur-md border border-white/10 rounded-[50%_50%_40%_40%] rotate-[25deg]"></div>
-      <div className="absolute bottom-[10%] left-[20%] w-[60%] h-[45%] bg-white/5 backdrop-blur-md border border-white/10 rounded-[40%_40%_50%_50%]"></div>
-    </div>
+  <div className={`absolute opacity-30 pointer-events-none ${className}`}>
+    <FaPaw className="w-full h-full text-white/5" />
+  </div>
+);
+
+type BgPaw = {
+  left: number;
+  top: number;
+  size: number;
+  rotate: number;
+  mdOnly?: boolean;
+};
+
+const PAW_S = 3.5;
+const PAW_M = 5.5;
+const PAW_L = 8;
+
+const BG_PAWS: BgPaw[] = [
+  { left: 5, top: 6, size: PAW_L, rotate: 12 },
+  { left: 78, top: 8, size: PAW_L, rotate: 28 },
+  { left: 6, top: 70, size: PAW_L, rotate: -20, mdOnly: true },
+  { left: 76, top: 72, size: PAW_L, rotate: 15, mdOnly: true },
+  { left: 42, top: 6, size: PAW_L, rotate: -18, mdOnly: true },
+  { left: 48, top: 78, size: PAW_L, rotate: -80, mdOnly: true },
+  { left: 8, top: 36, size: PAW_M, rotate: 70 },
+  { left: 82, top: 40, size: PAW_M, rotate: -30 },
+  { left: 22, top: 22, size: PAW_M, rotate: 45, mdOnly: true },
+  { left: 58, top: 24, size: PAW_M, rotate: 160, mdOnly: true },
+  { left: 28, top: 58, size: PAW_M, rotate: 15, mdOnly: true },
+  { left: 62, top: 56, size: PAW_M, rotate: 120, mdOnly: true },
+  { left: 3, top: 50, size: PAW_M, rotate: 45, mdOnly: true },
+  { left: 88, top: 56, size: PAW_M, rotate: -40, mdOnly: true },
+  { left: 16, top: 84, size: PAW_M, rotate: 30, mdOnly: true },
+  { left: 36, top: 40, size: PAW_M, rotate: 12, mdOnly: true },
+  { left: 14, top: 8, size: PAW_S, rotate: 8 },
+  { left: 92, top: 14, size: PAW_S, rotate: -25 },
+  { left: 16, top: 30, size: PAW_S, rotate: 60 },
+  { left: 94, top: 34, size: PAW_S, rotate: -8 },
+  { left: 12, top: 60, size: PAW_S, rotate: 18 },
+  { left: 24, top: 88, size: PAW_S, rotate: -100 },
+  { left: 32, top: 8, size: PAW_S, rotate: 22, mdOnly: true },
+  { left: 54, top: 6, size: PAW_S, rotate: -12, mdOnly: true },
+  { left: 68, top: 8, size: PAW_S, rotate: 50, mdOnly: true },
+  { left: 34, top: 18, size: PAW_S, rotate: 90, mdOnly: true },
+  { left: 50, top: 18, size: PAW_S, rotate: -45, mdOnly: true },
+  { left: 70, top: 22, size: PAW_S, rotate: 100, mdOnly: true },
+  { left: 20, top: 48, size: PAW_S, rotate: 130, mdOnly: true },
+  { left: 40, top: 52, size: PAW_S, rotate: -70, mdOnly: true },
+  { left: 54, top: 46, size: PAW_S, rotate: 35, mdOnly: true },
+  { left: 70, top: 46, size: PAW_S, rotate: -90, mdOnly: true },
+  { left: 32, top: 74, size: PAW_S, rotate: -50, mdOnly: true },
+  { left: 58, top: 70, size: PAW_S, rotate: 25, mdOnly: true },
+  { left: 92, top: 70, size: PAW_S, rotate: -15, mdOnly: true },
+  { left: 62, top: 90, size: PAW_S, rotate: -70, mdOnly: true },
+];
+
+const FleeingPaw = ({
+  paw,
+  mouseX,
+  mouseY,
+}: {
+  paw: BgPaw;
+  mouseX: MotionValue<number>;
+  mouseY: MotionValue<number>;
+}) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 170, damping: 20 });
+  const sy = useSpring(y, { stiffness: 170, damping: 20 });
+
+  useEffect(() => {
+    const fleeR = 170;
+    const fleeMax = 88;
+    const update = (mx: number, my: number) => {
+      if (paw.mdOnly && window.innerWidth < 768) {
+        x.set(0);
+        y.set(0);
+        return;
+      }
+      const sizePx = paw.size * 16;
+      const cx = (paw.left / 100) * window.innerWidth + sizePx / 2;
+      const cy = (paw.top / 100) * window.innerHeight + sizePx / 2;
+      const dx = cx - mx;
+      const dy = cy - my;
+      const dist = Math.hypot(dx, dy) || 1;
+      if (dist < fleeR) {
+        const strength = (fleeR - dist) / fleeR;
+        x.set((dx / dist) * strength * fleeMax);
+        y.set((dy / dist) * strength * fleeMax);
+      } else {
+        x.set(0);
+        y.set(0);
+      }
+    };
+    const unsubX = mouseX.on('change', (mx) => update(mx, mouseY.get()));
+    const unsubY = mouseY.on('change', (my) => update(mouseX.get(), my));
+    return () => {
+      unsubX();
+      unsubY();
+    };
+  }, [mouseX, mouseY, paw, x, y]);
+
+  return (
+    <motion.div
+      className={`absolute pointer-events-none opacity-30 ${paw.mdOnly ? 'hidden md:block' : ''}`}
+      style={{
+        left: `${paw.left}%`,
+        top: `${paw.top}%`,
+        width: `${paw.size}rem`,
+        height: `${paw.size}rem`,
+        rotate: paw.rotate,
+        x: sx,
+        y: sy,
+      }}
+    >
+      <FaPaw className="w-full h-full text-white/5" />
+    </motion.div>
+  );
+};
+
+const BURST_ANGLES = [-150, -110, -70, -35, 0, 40, 80, 120, 160, 200];
+
+const PawClickBurst = ({ x, y }: { x: number; y: number }) => (
+  <div className="fixed z-[20000] pointer-events-none" style={{ left: x, top: y }}>
+    <motion.span
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-red-300/80"
+      initial={{ opacity: 0.9, width: 12, height: 12 }}
+      animate={{ opacity: 0, width: 220, height: 220 }}
+      transition={{ duration: 0.55, ease: 'easeOut' }}
+    />
+    {BURST_ANGLES.map((deg, i) => {
+      const dist = i % 2 === 0 ? 160 : 110;
+      return (
+        <motion.span
+          key={i}
+          className="absolute text-red-300"
+          initial={{ opacity: 1, x: 0, y: 0, scale: 0.7, rotate: 0 }}
+          animate={{
+            opacity: 0,
+            x: Math.cos((deg * Math.PI) / 180) * dist,
+            y: Math.sin((deg * Math.PI) / 180) * dist,
+            scale: 1.85,
+            rotate: deg * 0.4,
+          }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: i * 0.012 }}
+        >
+          <FaPaw className="text-4xl md:text-5xl drop-shadow-[0_0_16px_rgba(248,113,113,1)]" />
+        </motion.span>
+      );
+    })}
   </div>
 );
 
@@ -191,6 +334,17 @@ const AccentText = ({
 
 const isUndecidedLabel = (value: string) => /未定|TBD|미정/.test(value);
 
+const SCHEDULE_TITLE_MAX = 56;
+
+const clampScheduleTitle = (title: string) =>
+  title.length > SCHEDULE_TITLE_MAX ? title.slice(0, SCHEDULE_TITLE_MAX) : title;
+
+const clampScheduleDisplay = (title: string) => {
+  const nl = title.indexOf('\n');
+  if (nl === -1) return clampScheduleTitle(title);
+  return `${title.slice(0, nl + 1)}${clampScheduleTitle(title.slice(nl + 1))}`;
+};
+
 // PC用スケジュールパーツ
 const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotate: string }) => (
   <motion.div 
@@ -204,7 +358,7 @@ const PawFinger = ({ date, title, rotate }: { date: string, title: string, rotat
     ) : (
       <span className="text-sm md:text-base font-bold text-red-300">{date}</span>
     )}
-            <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium whitespace-pre-wrap">{title}</span>
+            <span className="text-[11px] md:text-xs text-[#d1c5c7] mt-2 text-center leading-snug font-medium whitespace-pre-wrap">{clampScheduleDisplay(title)}</span>
   </motion.div>
 );
 
@@ -232,13 +386,31 @@ const menuPawParticles = [
   { left: '85%', rotateFrom: 190, rotateTo: 360 },
 ];
 
-const mashmallowPawTrail = [
-  { left: '8%', top: '76%' },
-  { left: '26%', top: '60%' },
-  { left: '44%', top: '44%' },
-  { left: '62%', top: '28%' },
-  { left: '80%', top: '12%' },
-];
+const mashmallowPawTrail = (() => {
+  const start = { x: 10, y: 80 };
+  const end = { x: 84, y: 14 };
+  const pairs = 4;
+  const stance = 3.4;
+  const pairAlong = 0.045;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const len = Math.hypot(dx, dy);
+  const px = -dy / len;
+  const py = dx / len;
+  const travelRotate = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
+
+  return Array.from({ length: pairs }, (_, pair) => {
+    const tCenter = pair / (pairs - 1);
+    return ([-1, 1] as const).map((side) => {
+      const t = tCenter + side * pairAlong;
+      return {
+        left: `${start.x + dx * t + px * stance * side}%`,
+        top: `${start.y + dy * t + py * stance * side}%`,
+        rotate: travelRotate,
+      };
+    });
+  }).flat();
+})();
 
 const LanguageSwitcher = ({
   lang,
@@ -341,12 +513,13 @@ const ContactTapHint = ({
       {!hidden && (
         <motion.div
           className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-[calc(100%+2.7rem)] pointer-events-auto cursor-pointer select-none z-[40] hidden xl:block"
-          initial={{ opacity: 0, x: -8 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -8 }}
-          transition={{ duration: 0.35 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
           onClick={(e) => {
             e.stopPropagation();
+            if (hidden) return;
             onTap();
           }}
           role="button"
@@ -446,6 +619,8 @@ export default function Home() {
   const cursorY = useSpring(mouseY, { stiffness: 600, damping: 20 });
   const [isHoveringLink, setIsHoveringLink] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
+  const [pawBursts, setPawBursts] = useState<{ id: number; x: number; y: number }[]>([]);
+  const burstIdRef = useRef(0);
 
   // 立ち絵の3Dチルト用
   const tiltRef = useRef<HTMLDivElement>(null);
@@ -455,10 +630,6 @@ export default function Home() {
   const springTiltY = useSpring(tiltY, { stiffness: 200, damping: 10 });
   const tiltRotateX = useTransform(springTiltY, [-0.5, 0.5], [10, -10]);
   const tiltRotateY = useTransform(springTiltX, [-0.5, 0.5], [-10, 10]);
-
-  // 背景のパララックス用マップ
-  const bgX = useTransform(cursorX, [0, 1200], [-30, 30]);
-  const bgY = useTransform(cursorY, [0, 800], [-30, 30]);
 
   // ✅ カレンダー用state
   const [nextLive, setNextLive] = useState<{date: string, title: string}>({ date: "読込中🐾", title: "..." });
@@ -508,7 +679,7 @@ export default function Home() {
 
             return {
               date: `${month}/${day} (${dayOfWeek})`,
-              title: `${timeString}${event.summary || '秘密の予定🐾'}`,
+              title: `${timeString}${clampScheduleTitle(event.summary || '秘密の予定🐾')}`,
             };
           });
         }
@@ -633,6 +804,25 @@ export default function Home() {
     window.localStorage.setItem('gururu-lang', lang);
     document.documentElement.lang = lang;
   }, [lang]);
+
+  const spawnPawBurst = (x: number, y: number) => {
+    const id = ++burstIdRef.current;
+    setPawBursts((prev) => [...prev, { id, x, y }]);
+    window.setTimeout(() => {
+      setPawBursts((prev) => prev.filter((b) => b.id !== id));
+    }, 850);
+  };
+
+  const handleTagNavigate = (e: MouseEvent<HTMLAnchorElement>, tag: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const url = e.currentTarget.href;
+    spawnPawBurst(e.clientX, e.clientY);
+    navigator.clipboard?.writeText(tag).catch(() => {});
+    window.setTimeout(() => {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, 620);
+  };
 
   const handleCutTicket = () => {
     if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
@@ -764,24 +954,21 @@ export default function Home() {
         </AnimatePresence>
       </motion.div>
 
-      {/* TODO: PCのみ画面下SD。魚をぐるるが一方通行で追う。端で反転せずリスポーン。肉球トレイル最大3。イラスト待ち。 */}
+      {pawBursts.map((burst) => (
+        <PawClickBurst key={burst.id} x={burst.x} y={burst.y} />
+      ))}
+
+      {/* TODO: PCのみ画面下SD。魚をぐるるが一方通行で追う。端で反転せずリスポーン。肉球トレイル最大3。地面の楕円影。イラスト待ち。 */}
+      {/* TODO: ヘッダー名を0.9秒以内に5回クリック → SD（ドット絵の可能性あり）が走って通り過ぎる。イラスト待ち。 */}
       <main className={`min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 relative ${showSplash ? 'h-screen overflow-hidden' : 'overflow-x-hidden'}`}>
         <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-50"></div>
 
         <motion.div 
-          className="fixed inset-0 pointer-events-none z-0 overflow-hidden text-black select-none"
-          style={{ x: bgX, y: bgY }}
+          className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
         >
-          <GlassPawBG className="w-48 h-48 top-[5%] left-[5%] rotate-12" />
-          <GlassPawBG className="hidden md:block w-96 h-96 top-[60%] right-[-10%] -rotate-45 opacity-20" />
-          <GlassPawBG className="w-32 h-32 top-[35%] right-[15%] rotate-[70deg]" />
-          <GlassPawBG className="hidden md:block w-64 h-64 top-[80%] left-[10%] rotate-[-20deg]" />
-          <GlassPawBG className="w-40 h-40 top-[20%] left-[45%] rotate-[180deg]" />
-          <GlassPawBG className="hidden md:block w-24 h-24 top-[50%] left-[5%] rotate-45 opacity-25" />
-          <GlassPawBG className="w-80 h-80 top-[10%] left-[80%] -rotate-[30deg] opacity-15" />
-          <GlassPawBG className="hidden md:block w-56 h-56 top-[60%] left-[60%] rotate-[120deg]" />
-          <GlassPawBG className="w-32 h-32 top-[70%] left-[25%] rotate-[15deg] opacity-35" />
-          <GlassPawBG className="hidden md:block w-44 h-44 bottom-[5%] right-[30%] -rotate-[100deg]" />
+          {BG_PAWS.map((paw, i) => (
+            <FleeingPaw key={i} paw={paw} mouseX={mouseX} mouseY={mouseY} />
+          ))}
           <span className="absolute top-[25%] right-[5%] text-6xl opacity-[0.02] -rotate-12">🦴</span>
           <span className="hidden md:block absolute top-[75%] left-[40%] text-5xl opacity-[0.03] rotate-45">🦴</span>
         </motion.div>
@@ -790,10 +977,11 @@ export default function Home() {
           
           <header className="fixed top-0 w-full h-16 bg-[#453e40]/90 backdrop-blur-sm border-b border-white/10 z-[60] flex items-center justify-between px-4 sm:px-6 md:px-10 xl:px-16 shadow-sm overflow-visible">
             <div className="flex items-center gap-2">
-              <span className="text-2xl opacity-80">🐾</span>
-              <div className="font-bold text-sm sm:text-base tracking-[0.1em] cursor-default">
+              <span className="tracking-normal leading-none text-3xl sm:text-4xl">🐈‍⬛</span>
+              <div className="font-black text-xl sm:text-2xl md:text-3xl leading-none tracking-[0.08em] cursor-default">
                 <SiteName />
               </div>
+              <span className="tracking-normal leading-none text-3xl sm:text-4xl">⛓️</span>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3 md:gap-4 xl:gap-6">
@@ -885,7 +1073,8 @@ export default function Home() {
               {/* ========================================== */}
               {/* ▼ PC用サブタイトル（1280px以上） ▼ */}
               {/* ========================================== */}
-              <div className={`hidden xl:flex items-center justify-start mt-6 mb-2 font-bold tracking-widest w-full ${lang === 'ja' ? 'whitespace-nowrap' : 'flex-wrap'}`}>
+              <div className={`hidden xl:inline-flex relative isolate items-center justify-start mt-6 mb-2 font-bold tracking-widest w-fit max-w-full px-4 py-1 ${lang === 'ja' ? 'whitespace-nowrap' : 'flex-wrap'}`}>
+                <span aria-hidden className="pointer-events-none absolute inset-x-[-8px] top-[22%] bottom-[22%] -z-10 rounded-full bg-[#fff4f6]/20 blur-lg" />
                 <AccentText className={`text-[28px] 2xl:text-[40px] ${lang === 'ja' ? '' : 'whitespace-normal'}`}>{t.fvSubLead}</AccentText>
                 <span className="flex flex-row items-center mx-3 whitespace-nowrap">
                   <span className="text-[24px] 2xl:text-[30px] opacity-90 tracking-normal">🐈‍⬛</span>
@@ -897,7 +1086,8 @@ export default function Home() {
               {/* ========================================== */}
               {/* ▼ モバイル・タブレット用サブタイトル ▼ */}
               {/* ========================================== */}
-              <div className="flex xl:hidden flex-col items-center md:items-start justify-center mt-6 mb-2 font-bold tracking-widest w-full">
+              <div className="inline-flex xl:hidden relative isolate flex-col items-center md:items-start justify-center mt-6 mb-2 font-bold tracking-widest w-fit max-w-full px-3 py-1">
+                <span aria-hidden className="pointer-events-none absolute inset-x-[-8px] top-[22%] bottom-[22%] -z-10 rounded-full bg-[#fff4f6]/20 blur-lg" />
                 <AccentText className={`text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] ${lang === 'ja' ? 'whitespace-nowrap' : 'whitespace-normal text-center md:text-left'}`}>{t.fvSubLead}</AccentText>
                 <span className="flex flex-row items-center mt-2 whitespace-nowrap">
                   <span className="text-[15px] sm:text-[16px] md:text-[20px] lg:text-[24px] opacity-90 tracking-normal">🐈‍⬛</span>
@@ -942,7 +1132,7 @@ export default function Home() {
                 <img
                   src="/img/fv1.jpg"
                   alt="猫喰ぐるる"
-                  className="w-full h-full object-cover object-top scale-150 origin-top"
+                  className="w-full h-full object-cover object-center"
                 />
               </motion.div>
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-red-400/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
@@ -1041,8 +1231,10 @@ export default function Home() {
           >
             <div className="bg-[#544b4d] rounded-[2.5rem] md:rounded-[4rem] px-6 sm:px-8 pt-10 pb-10 md:p-12 lg:p-16 xl:p-24 border border-white/10 relative overflow-hidden shadow-2xl min-h-[70vh] md:min-h-[80vh] flex flex-col justify-center">
               <div className="absolute top-10 right-10 text-9xl opacity-[0.01] rotate-12">🐾</div>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-10 md:mb-16 flex items-center gap-4 tracking-widest">
-                <span className="text-red-400 opacity-50">🐾</span> <AccentText>{t.profileTitle}</AccentText>
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-black mb-10 md:mb-16 flex items-center gap-3 md:gap-4 tracking-widest">
+                <span className="tracking-normal">🐈‍⬛</span>
+                <AccentText>{t.profileTitle}</AccentText>
+                <span className="tracking-normal">⛓️</span>
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-10 items-center w-full">
                 <div className="w-full text-left space-y-4 md:space-y-8 text-[#d1c5c7] text-[16px] md:text-lg lg:text-xl leading-relaxed md:leading-loose font-bold tracking-wide">
@@ -1107,19 +1299,20 @@ export default function Home() {
                 // その場合は表示を「？？？」or「募集中」にし、総合タグだけX検索リンクを無効化する（ファンアートは現状維持）。
                 { label: t.tagGeneral, tag: '#ぐるるのおもちゃ' },
                 { label: t.tagFanart, tag: '#ぐるるの噛み跡' },
-              ].map((t) => (
+              ].map((item) => (
                 <motion.a 
-                  key={t.label} 
-                  href={`https://x.com/search?q=${encodeURIComponent(t.tag)}`}
+                  key={item.label} 
+                  href={`https://x.com/search?q=${encodeURIComponent(item.tag)}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => handleTagNavigate(e, item.tag)}
                   className="block w-full md:w-1/2 bg-[#544b4d] border border-red-400/20 rounded-[3rem] py-12 px-6 text-center shadow-lg hover:border-red-400 hover:-translate-y-2 hover:shadow-red-500/20 transition-all cursor-pointer group relative overflow-hidden"
                   onHoverStart={() => setIsHoveringLink(true)}
                   onHoverEnd={() => setIsHoveringLink(false)}
                 >
                   <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                  <p className="text-sm lg:text-base mb-4 font-black"><AccentText>{t.label}</AccentText></p>
-                  <p className="text-2xl lg:text-3xl font-black text-[#E7E4DC] tracking-wider group-hover:text-red-300 transition-colors">{t.tag}</p>
+                  <p className="text-xl lg:text-2xl mb-4 font-black"><AccentText>{item.label}</AccentText></p>
+                  <p className="text-2xl lg:text-3xl font-black text-[#E7E4DC] tracking-wider group-hover:text-red-300 transition-colors">{item.tag}</p>
                   <div className="mt-6 text-xs text-gray-400 animate-pulse">{t.tagSearch}</div>
                 </motion.a>
               ))}
@@ -1141,16 +1334,9 @@ export default function Home() {
               onHoverEnd={() => setIsHoveringLink(false)}
             >
               <div className="aspect-video bg-[#544b4d]/80 backdrop-blur-md border border-red-400/20 rounded-[3rem] flex flex-col items-center justify-center overflow-hidden relative shadow-xl transition-all duration-500 hover:border-red-400/40 hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.25)]">
-                <GlassPawBG className="w-40 h-40 md:w-64 md:h-64 top-[-10%] left-[-6%] rotate-12" />
-                <GlassPawBG className="w-36 h-36 md:w-52 md:h-52 bottom-[-12%] right-[-4%] -rotate-[30deg]" />
-                <GlassPawBG className="hidden md:block w-24 h-24 top-[8%] right-[14%] rotate-[50deg]" />
-
-                <div className="absolute inset-0 pointer-events-none opacity-45">
-                  <FaPaw className="absolute bottom-[14%] left-[8%] text-4xl md:text-6xl text-[#3a3335] -rotate-12" />
-                  <FaPaw className="absolute top-[16%] left-[18%] text-3xl md:text-5xl text-[#3a3335] rotate-12" />
-                  <FaPaw className="absolute top-[20%] right-[14%] text-4xl md:text-5xl text-[#3a3335] -rotate-6" />
-                  <FaPaw className="absolute bottom-[18%] right-[10%] text-3xl md:text-6xl text-[#3a3335] rotate-[18deg]" />
-                </div>
+                <GlassPawBG className="w-28 h-28 md:w-40 md:h-40 top-[6%] left-[5%] rotate-12" />
+                <GlassPawBG className="w-24 h-24 md:w-36 md:h-36 bottom-[6%] right-[5%] -rotate-[30deg]" />
+                <GlassPawBG className="hidden md:block w-20 h-20 top-[10%] right-[22%] rotate-[50deg]" />
 
                 <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 via-transparent to-red-300/5 pointer-events-none"></div>
                 <div className="absolute inset-0 bg-red-400/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
@@ -1196,16 +1382,20 @@ export default function Home() {
                 {mashmallowPawTrail.map((p, i) => (
                   <motion.div
                     key={i}
-                    className="absolute text-5xl md:text-6xl rotate-[28deg]"
-                    style={{ left: p.left, top: p.top, translateY: i % 2 === 0 ? '-6px' : '6px' }}
+                    className="absolute text-4xl md:text-5xl origin-center"
+                    style={{
+                      left: p.left,
+                      top: p.top,
+                      rotate: p.rotate,
+                    }}
                     animate={{ opacity: [0, 1, 1, 0] }}
                     transition={{
-                      duration: 5.2,
-                      delay: i * 0.5,
+                      duration: 4.6,
+                      delay: Math.floor(i / 2) * 0.72 + (i % 2) * 0.14,
                       repeat: Infinity,
-                      repeatDelay: 2.4,
+                      repeatDelay: 2.2,
                       ease: 'easeInOut',
-                      times: [0, 0.1, 0.72, 1],
+                      times: [0, 0.08, 0.72, 1],
                     }}
                   >
                     <span className="relative inline-flex">
@@ -1224,14 +1414,15 @@ export default function Home() {
 
               <div className="relative mb-8 md:mb-12 z-20 mt-6 group-hover:drop-shadow-[0_0_8px_rgba(255,220,227,0.4)] transition-all duration-300">
                 <motion.div
-                  className="inline-block mb-3 text-red-400/40 text-2xl md:text-3xl"
+                  className="mx-auto mb-3 w-14 h-14 md:w-16 md:h-16 rounded-full bg-red-500/15 flex items-center justify-center backdrop-blur-sm border border-red-300/30 shadow-[0_0_28px_rgba(248,113,113,0.45)]"
                   animate={{ y: [0, -7, 0] }}
                   transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  <FaPaw />
+                  <FaPaw className="text-2xl md:text-3xl text-red-300 drop-shadow-[0_0_10px_rgba(248,113,113,0.85)]" />
                 </motion.div>
-                <h2 className={`text-lg sm:text-xl md:text-3xl lg:text-4xl font-black text-[#E7E4DC] mb-0 tracking-widest drop-shadow-sm flex items-center justify-center gap-2 px-2 ${lang === 'ja' ? 'whitespace-nowrap' : 'text-center'}`}>
-                  {t.mashTitle}
+                <h2 className={`relative isolate w-fit mx-auto text-xl sm:text-2xl md:text-4xl lg:text-5xl font-black mb-0 tracking-widest flex items-center justify-center gap-2 px-3 ${lang === 'ja' ? 'whitespace-nowrap' : 'text-center'}`}>
+                  <span aria-hidden className="pointer-events-none absolute inset-x-[-8px] top-[22%] bottom-[22%] -z-10 rounded-full bg-[#fff4f6]/20 blur-lg" />
+                  <AccentText>{t.mashTitle}</AccentText>
                 </h2>
               </div>
 
@@ -1344,7 +1535,7 @@ export default function Home() {
                 ) : (
                   <span className="text-4xl md:text-5xl font-black text-[#f4ebeb] mb-6 tracking-wider drop-shadow-md">{fmtDate(nextLive.date)}</span>
                 )}
-                <span className="text-lg md:text-xl text-[#d1c5c7] font-bold border-t border-white/10 pt-6 w-3/4 text-center leading-relaxed whitespace-pre-wrap">{nextLive.title}</span>
+                <span className="text-lg md:text-xl text-[#d1c5c7] font-bold border-t border-white/10 pt-6 w-3/4 text-center leading-relaxed whitespace-pre-wrap">{clampScheduleDisplay(nextLive.title)}</span>
               </motion.div>
               <div className="absolute bottom-[-2vh] left-[calc(50%-150px)] w-[300px] h-10 bg-black/30 rounded-[50%] blur-xl opacity-80 z-0"></div>
             </div>
@@ -1366,7 +1557,7 @@ export default function Home() {
                       <span className="text-[#f4ebeb]">{fmtDate(nextLive.date)}</span>
                     )}
                   </h3>
-                  <p className="text-sm md:text-base text-[#d1c5c7] font-bold whitespace-pre-wrap">{nextLive.title}</p>
+                  <p className="text-sm md:text-base text-[#d1c5c7] font-bold whitespace-pre-wrap">{clampScheduleDisplay(nextLive.title)}</p>
                 </motion.div>
               </div>
               
@@ -1382,7 +1573,7 @@ export default function Home() {
                         <span className="text-red-300">{fmtDate(item.date)}</span>
                       )}
                     </h3>
-                    <p className="text-xs md:text-sm text-[#d1c5c7] font-medium whitespace-pre-wrap">{item.title}</p>
+                    <p className="text-xs md:text-sm text-[#d1c5c7] font-medium whitespace-pre-wrap">{clampScheduleDisplay(item.title)}</p>
                   </motion.div>
                 </div>
               ))}
@@ -1404,7 +1595,7 @@ export default function Home() {
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              <ContactTapHint hidden={false} label={t.tap} onTap={handleCutTicket} />
+              <ContactTapHint hidden={isTicketCut} label={t.tap} onTap={handleCutTicket} />
 
               <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
 
@@ -1558,15 +1749,15 @@ export default function Home() {
             </motion.div>
           </motion.section>
 
-          <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-32 lg:mb-48 max-w-5xl mx-auto text-center border-t border-white/10 pt-20 relative z-10 scroll-mt-24">
-            <h2 className="text-sm lg:text-base font-bold text-[#E7E4DC] mb-6 tracking-widest">{t.guidelineTitle}</h2>
-            <p className="text-xs lg:text-sm text-[#a89c9e] leading-relaxed max-w-3xl mx-auto font-medium">
+          <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-8 lg:mb-10 max-w-5xl mx-auto text-center border-t border-white/10 pt-10 lg:pt-12 relative z-10 scroll-mt-24">
+            <h2 className="text-lg lg:text-xl font-bold text-[#E7E4DC] mb-4 tracking-widest">{t.guidelineTitle}</h2>
+            <p className="text-base lg:text-lg text-[#a89c9e] leading-relaxed max-w-3xl mx-auto font-medium whitespace-pre-line">
               {t.guidelineBody}
             </p>
           </section>
 
-          <footer className="py-20 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
-            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 sm:gap-4 md:gap-8 max-w-[340px] sm:max-w-[380px] md:max-w-none mx-auto mb-16">
+          <footer className="py-10 lg:py-12 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
+            <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 sm:gap-4 md:gap-8 max-w-[340px] sm:max-w-[380px] md:max-w-none mx-auto mb-8">
               {snsLinks.map((sns) => (
                 <a 
                   key={`footer-${sns.n}`} 
@@ -1583,13 +1774,13 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="mb-12 flex flex-col items-center gap-6">
+            <div className="mb-8 flex flex-col items-center gap-4">
               <div className="text-3xl lg:text-4xl italic font-black select-none tracking-widest cursor-default">
                 <SiteName />
               </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
-                {t.siteCredit}: <span className="text-white/80">"火日"</span>
+                {t.siteCredit} <span className="tracking-normal">🐈‍⬛⛓️</span>: <span className="text-white/80">"友情制作"</span>
               </p>
             </div>
 
