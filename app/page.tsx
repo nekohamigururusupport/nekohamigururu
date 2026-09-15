@@ -282,33 +282,36 @@ const FleeingPaw = ({
   );
 };
 
-const BURST_ANGLES = [-150, -110, -70, -35, 0, 40, 80, 120, 160, 200];
+const BURST_COUNT = 12;
+const BURST_DIST = 148;
 
 const PawClickBurst = ({ x, y }: { x: number; y: number }) => (
   <div className="fixed z-[20000] pointer-events-none" style={{ left: x, top: y }}>
     <motion.span
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-red-300/80"
-      initial={{ opacity: 0.9, width: 12, height: 12 }}
-      animate={{ opacity: 0, width: 220, height: 220 }}
+      className="absolute rounded-full border-2 border-red-300/80"
+      initial={{ opacity: 0.85, width: 16, height: 16, x: -8, y: -8 }}
+      animate={{ opacity: 0, width: 260, height: 260, x: -130, y: -130 }}
       transition={{ duration: 0.55, ease: 'easeOut' }}
     />
-    {BURST_ANGLES.map((deg, i) => {
-      const dist = i % 2 === 0 ? 160 : 110;
+    {Array.from({ length: BURST_COUNT }, (_, i) => {
+      const deg = (360 / BURST_COUNT) * i;
+      const rad = (deg * Math.PI) / 180;
+      const heading = deg + 90;
       return (
         <motion.span
           key={i}
-          className="absolute text-red-300"
-          initial={{ opacity: 1, x: 0, y: 0, scale: 0.7, rotate: 0 }}
+          className="absolute origin-center text-red-300"
+          initial={{ opacity: 1, x: 0, y: 0, scale: 0.55, rotate: heading }}
           animate={{
             opacity: 0,
-            x: Math.cos((deg * Math.PI) / 180) * dist,
-            y: Math.sin((deg * Math.PI) / 180) * dist,
-            scale: 1.85,
-            rotate: deg * 0.4,
+            x: Math.cos(rad) * BURST_DIST,
+            y: Math.sin(rad) * BURST_DIST,
+            scale: 1.55,
+            rotate: heading,
           }}
-          transition={{ duration: 0.7, ease: 'easeOut', delay: i * 0.012 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
         >
-          <FaPaw className="text-4xl md:text-5xl drop-shadow-[0_0_16px_rgba(248,113,113,1)]" />
+          <FaPaw className="text-4xl md:text-5xl -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_16px_rgba(248,113,113,1)]" />
         </motion.span>
       );
     })}
