@@ -29,6 +29,13 @@ const releasedMetadata: Metadata = {
     locale: "ja_JP",
     type: "website",
   },
+  icons: {
+    icon: [
+      { url: "/favicons/released.ico", sizes: "48x48" },
+      { url: "/favicons/released.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: "/favicons/released.png",
+  },
   twitter: {
     card: "summary_large_image",
     title: "猫喰ぐるる🐾 公式サイト",
@@ -57,6 +64,9 @@ const preReleaseMetadata: Metadata = {
     ],
     locale: "ja_JP",
     type: "website",
+  },
+  icons: {
+    icon: { url: "/favicons/soon.ico" },
   },
   twitter: {
     card: "summary_large_image",

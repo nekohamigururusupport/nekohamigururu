@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
+import { isSiteReleased } from "./lib/site-release";
+
+const favicon = isSiteReleased()
+  ? "/favicons/released.ico"
+  : "/favicons/soon.ico";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [{ source: "/favicon.ico", destination: favicon }];
+  },
 };
 
 export default nextConfig;
