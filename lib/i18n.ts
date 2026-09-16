@@ -49,9 +49,24 @@ export const translations = {
     contactBodyAfter: 'にて承ってます',
     tap: 'タップ',
     guidelineTitle: '二次創作・ガイドラインについて',
-    guidelineBody:
-      'ファンアートや切り抜き動画の制作は原則大歓迎です！\n制作の際は、他の方の迷惑にならない範囲で、愛を持って楽しんでいただけると嬉しいです。\n（※センシティブな内容や、公式と誤認されるような表現はお控えください）',
+    guidelineItems: [
+      {
+        left: '趣味の範囲なら、好きにしてくれてかまいません。会社名義や、本格的な商用は不可です。',
+        right: '公式の立ち絵・ロゴ・配信画面をそのまま転載するのはNGです。二次創作は歓迎します。素材の使い回しはしないでください。',
+      },
+      {
+        left: '切り抜きを上げるときは、概要欄に次を書いてください。\n・元になった配信／動画のURL\n・ぐるるのアカウントURL\n・公式ハッシュタグ',
+        right: 'センシティブな内容そのものは規制しません。ただし、投稿側でセンシティブと分かるように指定して、公式タグは使わないでください。',
+      },
+      {
+        left: 'AIで作ったものは禁止です。自分の手で作ってほしいです。',
+        right: '気になるものがあったら、削除をお願いすることがあります。この文章も、あとから直すことがあります。',
+      },
+    ],
+    guidelineWelcome:
+      'ファンアートや切り抜き動画の制作は原則大歓迎です！\n制作の際は、他の方の迷惑にならない範囲で、愛を持って楽しんでいただけると嬉しいです。',
     siteCredit: 'サイト制作',
+    siteCreditName: '友情協力：火日',
     followX: 'Official X をフォローして待っててね！',
     undecided: '未定🐾',
   },
@@ -97,9 +112,24 @@ export const translations = {
     contactBodyAfter: '',
     tap: 'TAP',
     guidelineTitle: 'About Fanworks & Guidelines',
-    guidelineBody:
-      'Fan art and clip videos are generally very welcome!\nWhen you make them, I’d be happy if you enjoy it with love, as long as it doesn’t trouble others.\n(*Please refrain from sensitive content or anything that could be mistaken for official.)',
-    siteCredit: 'Site by',
+    guidelineItems: [
+      {
+        left: 'Hobby use is fine. Company-name or serious commercial use is not allowed.',
+        right: 'Don’t repost official art, logos, or stream screens as-is. Fanworks are welcome. Don’t reuse the assets.',
+      },
+      {
+        left: 'When posting clips, put the following in the description.\n・URL of the original stream/video\n・Gururu’s account URL\n・Official hashtags',
+        right: 'Sensitive content itself isn’t banned. Mark it as sensitive on your post, and don’t use official tags.',
+      },
+      {
+        left: 'AI-made works are prohibited. Please make them by hand.',
+        right: 'If something bothers me, I may ask you to take it down. This text may also change later.',
+      },
+    ],
+    guidelineWelcome:
+      'Fan art and clip videos are generally very welcome!\nWhen you make them, I’d be happy if you enjoy it with love, as long as it doesn’t trouble others.',
+    siteCredit: 'Website',
+    siteCreditName: '友情協力：火日',
     followX: 'Follow Official X and wait for me!',
     undecided: 'TBD🐾',
   },
@@ -145,9 +175,24 @@ export const translations = {
     contactBodyAfter: '으로 받아요',
     tap: '탭',
     guidelineTitle: '2차 창작·가이드라인에 대해',
-    guidelineBody:
-      '팬아트와 클립 영상 제작은 원칙적으로 대환영입니다!\n만들 때는 다른 사람에게 피해가 가지 않는 범위에서, 애정을 담아 즐겨 주시면 좋겠어요.\n(※민감한 내용이나 공식으로 오해될 표현은 삼가 주세요)',
+    guidelineItems: [
+      {
+        left: '취미 범위라면 자유롭게 해 주셔도 됩니다. 회사 명의나 본격적인 상업 이용은 불가합니다.',
+        right: '공식 스탠딩・로고・방송 화면을 그대로 전재하는 것은 NG입니다. 2차 창작은 환영합니다. 소재를 그대로 쓰지 마세요.',
+      },
+      {
+        left: '클립을 올릴 때는 설명란에 다음을 적어 주세요.\n・원본 방송/영상의 URL\n・ぐるる 계정 URL\n・공식 해시태그',
+        right: '민감한 내용 자체는 규제하지 않습니다. 다만 게시 쪽에서 민감하다고 알 수 있게 표시하고, 공식 태그는 사용하지 마세요.',
+      },
+      {
+        left: 'AI로 만든 것은 금지입니다. 직접 손으로 만들어 주세요.',
+        right: '신경 쓰이는 것이 있으면 삭제를 부탁할 수 있습니다. 이 글도 나중에 고칠 수 있어요.',
+      },
+    ],
+    guidelineWelcome:
+      '팬아트와 클립 영상 제작은 원칙적으로 대환영입니다!\n만들 때는 다른 사람에게 피해가 가지 않는 범위에서, 애정을 담아 즐겨 주시면 좋겠어요.',
     siteCredit: '사이트 제작',
+    siteCreditName: '友情協力：火日',
     followX: 'Official X를 팔로우하고 기다려 줘!',
     undecided: '미정🐾',
   },

@@ -106,6 +106,70 @@ const NAME_GURU_STYLE: CSSProperties = {
 const NAME_NEKO_CLASS = 'text-[#E7E4DC] drop-shadow-[0_0_3px_rgba(231,228,220,0.35)]';
 const NAME_GURU_CLASS = 'text-[#7A3038] drop-shadow-[0_0_4px_rgba(255,220,227,0.4)]';
 
+const SPLASH_COMMENTS = [
+  {
+    text: 'かわいい',
+    deco: '♡',
+    delay: 1.05,
+    pos: 'top-[12%] left-[4%] sm:left-[9%] md:left-[13%]',
+    rotate: -9,
+    className:
+      'font-[family-name:var(--font-yomogi)] bg-[#fff3ee] text-[#d45a6a] shadow-[3px_5px_0_rgba(212,90,106,0.28)] rounded-[1.6rem_1.2rem_1.7rem_1.1rem] text-2xl sm:text-3xl md:text-4xl',
+  },
+  {
+    text: 'モード系',
+    deco: '⛓️',
+    delay: 1.42,
+    pos: 'top-[17%] right-[3%] sm:right-[8%] md:right-[12%]',
+    rotate: 7,
+    className:
+      'bg-[#140e10]/75 text-[#f7ecec] border border-white/40 backdrop-blur-md tracking-[0.22em] rounded-full text-lg sm:text-xl md:text-2xl font-black',
+  },
+  {
+    text: '病み系',
+    deco: '†',
+    delay: 1.79,
+    pos: 'bottom-[21%] left-[5%] sm:left-[11%] md:left-[15%]',
+    rotate: -6,
+    className:
+      'font-[family-name:var(--font-yomogi)] bg-[#3a1820]/90 text-[#ff9aab] border border-dashed border-[#ff8aa0]/55 rounded-md text-2xl sm:text-3xl md:text-4xl shadow-[0_0_18px_rgba(248,113,113,0.25)]',
+  },
+  {
+    text: '静かそう',
+    deco: '…',
+    delay: 2.16,
+    pos: 'bottom-[16%] right-[4%] sm:right-[10%] md:right-[14%]',
+    rotate: 5,
+    className:
+      'bg-white/10 text-[#cfc4c6] border border-white/15 backdrop-blur-sm rounded-2xl text-lg sm:text-xl md:text-2xl font-medium tracking-[0.16em]',
+  },
+] as const;
+
+const SplashComment = ({
+  text,
+  deco,
+  delay,
+  pos,
+  rotate,
+  className,
+}: (typeof SPLASH_COMMENTS)[number]) => (
+  <motion.div
+    className={`absolute z-20 pointer-events-none select-none ${pos}`}
+    initial={{ scale: 0, opacity: 0, y: 16, rotate: rotate + 10 }}
+    animate={{ scale: 1, opacity: 1, y: 0, rotate }}
+    transition={{ delay, type: 'spring', stiffness: 560, damping: 14 }}
+  >
+    <motion.span
+      className={`inline-flex items-baseline gap-2 px-5 py-2.5 sm:px-6 sm:py-3 ${className}`}
+      animate={{ y: [0, -6, 0] }}
+      transition={{ delay: delay + 0.45, duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+    >
+      <span>{text}</span>
+      <span className="text-[0.72em] opacity-80">{deco}</span>
+    </motion.span>
+  </motion.div>
+);
+
 // 🐾 オープニング画面コンポーネント（公開後のみ名前表示）
 const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showName: boolean }) => {
   useEffect(() => {
@@ -133,6 +197,10 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
     >
       {paws.map((p, i) => (
         <SplashNeonPaw key={i} top={p.top} left={p.left} rotate={p.rotate} delay={p.delay} scale={p.scale} />
+      ))}
+
+      {SPLASH_COMMENTS.map((comment) => (
+        <SplashComment key={comment.text} {...comment} />
       ))}
 
       <div className="relative z-10 px-4 flex justify-center w-full">
@@ -1752,11 +1820,25 @@ export default function Home() {
             </motion.div>
           </motion.section>
 
-          <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-8 lg:mb-10 max-w-5xl mx-auto text-center border-t border-white/10 pt-10 lg:pt-12 relative z-10 scroll-mt-24">
-            <h2 className="text-lg lg:text-xl font-bold text-[#E7E4DC] mb-4 tracking-widest">{t.guidelineTitle}</h2>
-            <p className="text-base lg:text-lg text-[#a89c9e] leading-relaxed max-w-3xl mx-auto font-medium whitespace-pre-line">
-              {t.guidelineBody}
-            </p>
+          <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-8 lg:mb-10 max-w-6xl mx-auto text-center border-t border-white/10 pt-10 lg:pt-12 relative z-10 scroll-mt-24">
+            <h2 className="text-lg lg:text-xl font-bold text-[#E7E4DC] mb-8 tracking-widest">{t.guidelineTitle}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-12 gap-y-6 md:gap-y-8 text-left">
+              {t.guidelineItems.flatMap((item, i) => [
+                <p key={`gl-${i}`} className="text-sm text-[#a89c9e] leading-relaxed font-medium whitespace-pre-line">
+                  {item.left}
+                </p>,
+                <p key={`gr-${i}`} className="text-sm text-[#a89c9e] leading-relaxed font-medium whitespace-pre-line">
+                  {item.right}
+                </p>,
+              ])}
+            </div>
+            <div className="mt-10 flex flex-col items-center gap-4">
+              <div className="w-12 h-[1px] bg-red-400/40"></div>
+              <p className="text-base lg:text-lg text-[#a89c9e] leading-relaxed max-w-3xl font-medium whitespace-pre-line">
+                {t.guidelineWelcome}
+              </p>
+              <div className="w-12 h-[1px] bg-red-400/40"></div>
+            </div>
           </section>
 
           <footer className="py-10 lg:py-12 px-6 text-center bg-[#3a3335] border-t border-white/5 relative z-20">
@@ -1783,7 +1865,7 @@ export default function Home() {
               </div>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
-                {t.siteCredit} <span className="tracking-normal">🐈‍⬛⛓️</span>: <span className="text-white/80">"友情制作"</span>
+                {t.siteCredit} <span className="tracking-normal">🐈‍⬛⛓️</span>: <span className="text-white/80">"{t.siteCreditName}"</span>
               </p>
             </div>
 

@@ -1,11 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { M_PLUS_Rounded_1c } from "next/font/google";
+import { M_PLUS_Rounded_1c, Yomogi } from "next/font/google";
 import { isSiteReleased, PRE_RELEASE_SITE_TITLE } from "@/lib/site-release";
 import "./globals.css";
 
 const roundedFont = M_PLUS_Rounded_1c({
   weight: ["400", "500", "700", "800", "900"],
   subsets: ["latin"],
+});
+
+const yomogi = Yomogi({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-yomogi",
 });
 
 const releasedMetadata: Metadata = {
@@ -90,7 +96,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className="scroll-smooth">
+    <html lang="ja" className={`scroll-smooth ${yomogi.variable}`}>
       <body className={roundedFont.className}>{children}</body>
     </html>
   );
