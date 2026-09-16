@@ -6,6 +6,7 @@ import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 import { isSiteReleased } from '@/lib/site-release';
 import { translations, LANG_OPTIONS, type Lang } from '@/lib/i18n';
+import { LuckyGururu } from '@/components/LuckyGururu';
 
 const preReleaseTitleParts = [
   { text: 'とある', className: 'text-[#f4ebeb]' },
@@ -1082,6 +1083,15 @@ export default function Home() {
             </button>
             </div>
           </header>
+
+          {!showSplash && (
+            <LuckyGururu
+              lang={lang}
+              t={t}
+              onTagNavigate={handleTagNavigate}
+              onHoverLink={setIsHoveringLink}
+            />
+          )}
 
           <AnimatePresence>
             {isMenuOpen && (
