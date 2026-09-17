@@ -795,7 +795,7 @@ export default function Home() {
 
   const snsLinks = [
     { n: 'X (Twitter)', url: 'https://x.com/h_neko20?s=21', Icon: FaXTwitter, c: 'bg-red-400/15 text-red-300 border-red-400/30' },
-    { n: 'YouTube', url: 'https://youtube.com/channel/UC_u4f-7IHt12WxU05JNctIQ?si=bzIZIOaWskbPPSX2', Icon: FaYoutube, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
+    { n: 'YouTube', url: 'https://www.youtube.com/@H_neko20', Icon: FaYoutube, c: 'bg-white/10 text-[#f4ebeb] border-white/20' },
     { n: 'TwitCasting', url: 'https://twitcasting.tv/h_neko20', Icon: TbBroadcast, c: 'bg-sky-400/10 text-sky-200 border-sky-400/20' },
     { n: 'TikTok', url: 'https://www.tiktok.com/@h_neko20?_r=1&_t=ZS-98sisJIc8iz', Icon: FaTiktok, c: 'bg-amber-400/10 text-amber-200 border-amber-400/20' }
   ];
@@ -1030,8 +1030,10 @@ export default function Home() {
         <PawClickBurst key={burst.id} x={burst.x} y={burst.y} />
       ))}
 
-      {/* TODO: PCのみ画面下SD。魚をぐるるが一方通行で追う。端で反転せずリスポーン。肉球トレイル最大3。地面の楕円影。イラスト待ち。 */}
-      {/* TODO: ヘッダー名を0.9秒以内に5回クリック → SD（ドット絵の可能性あり）が走って通り過ぎる。イラスト待ち。 */}
+      {/* TODO: PCのみ画面下SD追いかけ。魚をぐるるが一方通行で追う。端で反転せずリスポーン。肉球トレイル最大3。地面の楕円影。イラスト待ち。 */}
+      {/* TODO: ヘッダー名5回タップ → ドット絵ぐるるが現れて手を振る（AIアニメ）。ドット絵待ち。 */}
+      {/* TODO: 何もないところクリック → ヘッダーより下・横位置ランダムから魚が落ち、下でドット絵ぐるるがキャッチ（AIアニメ）。ドット絵待ち。 */}
+      {/* TODO: BGM。素材待ち。 */}
       <main className={`min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 relative ${showSplash ? 'h-screen overflow-hidden' : 'overflow-x-hidden'}`}>
         <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-50"></div>
 
