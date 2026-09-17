@@ -7,6 +7,7 @@ import { TbBroadcast } from 'react-icons/tb';
 import { isSiteReleased } from '@/lib/site-release';
 import { translations, LANG_OPTIONS, type Lang } from '@/lib/i18n';
 import { LuckyGururu } from '@/components/LuckyGururu';
+import { playTagSe, playTicketSe, TAG_SE_LOCK_MS, TICKET_NAV_MS, TICKET_RESET_MS } from '@/lib/se';
 
 const preReleaseTitleParts = [
   { text: 'とある', className: 'text-[#f4ebeb]' },
@@ -693,13 +694,16 @@ export default function Home() {
   const [isClicking, setIsClicking] = useState(false);
   const [pawBursts, setPawBursts] = useState<{ id: number; x: number; y: number }[]>([]);
   const burstIdRef = useRef(0);
+  const tagBusyRef = useRef(false);
+  const ticketBusyRef = useRef(false);
+  const ticketUnlockRef = useRef<NodeJS.Timeout | null>(null);
 
   // 立ち絵の3Dチルト用
   const tiltRef = useRef<HTMLDivElement>(null);
   const tiltX = useMotionValue(0);
   const tiltY = useMotionValue(0);
-  const springTiltX = useSpring(tiltX, { stiffness: 200, damping: 10 });
-  const springTiltY = useSpring(tiltY, { stiffness: 200, damping: 10 });
+  const springTiltX = useSpring(tiltX, { stiffness: 80, damping: 20, mass: 0.7 });
+  const springTiltY = useSpring(tiltY, { stiffness: 80, damping: 20, mass: 0.7 });
   const tiltRotateX = useTransform(springTiltY, [-0.5, 0.5], [10, -10]);
   const tiltRotateY = useTransform(springTiltX, [-0.5, 0.5], [-10, 10]);
 
@@ -888,45 +892,62 @@ export default function Home() {
   const handleTagNavigate = (e: MouseEvent<HTMLAnchorElement>, tag: string) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
+    if (tagBusyRef.current) return;
+    tagBusyRef.current = true;
     const url = e.currentTarget.href;
+    playTagSe();
     spawnPawBurst(e.clientX, e.clientY);
     navigator.clipboard?.writeText(tag).catch(() => {});
     window.setTimeout(() => {
       window.open(url, '_blank', 'noopener,noreferrer');
-    }, 620);
+      tagBusyRef.current = false;
+    }, TAG_SE_LOCK_MS);
   };
 
   const handleCutTicket = () => {
+    playTicketCut(TICKET_RESET_MS);
+  };
+
+  const playTicketCut = (lockMs: number) => {
+    if (ticketBusyRef.current) return false;
+    ticketBusyRef.current = true;
+    playTicketSe();
     if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
     const play = () => {
       setIsTicketCut(true);
       cutTimeoutRef.current = setTimeout(() => {
         setIsTicketCut(false);
-      }, 1500);
+      }, TICKET_RESET_MS);
     };
     if (isTicketCut) {
       setIsTicketCut(false);
       cutTimeoutRef.current = setTimeout(play, 40);
-      return;
+    } else {
+      play();
     }
-    play();
+    if (ticketUnlockRef.current) clearTimeout(ticketUnlockRef.current);
+    ticketUnlockRef.current = setTimeout(() => {
+      ticketBusyRef.current = false;
+    }, lockMs);
+    return true;
   };
 
   const handleSendMessage = (e: MouseEvent<HTMLAnchorElement>) => {
     e.stopPropagation();
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
-    handleCutTicket();
+    if (!playTicketCut(TICKET_NAV_MS)) return;
     if (sendTimeoutRef.current) clearTimeout(sendTimeoutRef.current);
     sendTimeoutRef.current = setTimeout(() => {
       window.open(TWITTER_DM_URL, '_blank', 'noopener,noreferrer');
-    }, 750);
+    }, TICKET_NAV_MS);
   };
 
   useEffect(() => {
     return () => {
       if (cutTimeoutRef.current) clearTimeout(cutTimeoutRef.current);
       if (sendTimeoutRef.current) clearTimeout(sendTimeoutRef.current);
+      if (ticketUnlockRef.current) clearTimeout(ticketUnlockRef.current);
     };
   }, []);
 
@@ -1200,15 +1221,14 @@ export default function Home() {
               }}
             >
               <motion.div 
-                className="relative h-56 sm:h-64 md:h-[360px] lg:h-[460px] xl:h-[550px] aspect-square bg-[#544b4d] border border-white/10 rounded-[3rem] md:rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group transition-all"
+                className="relative h-56 sm:h-64 md:h-[360px] lg:h-[460px] xl:h-[550px] aspect-square bg-[#544b4d] border border-white/10 rounded-[3rem] md:rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group will-change-transform"
                 style={{ rotateX: tiltRotateX, rotateY: tiltRotateY }}
               >
                 <div
-                  className="absolute inset-0 z-30 rounded-[4rem] pointer-events-none transition-opacity duration-100"
+                  className="absolute inset-0 z-30 rounded-[3rem] md:rounded-[4rem] pointer-events-none"
                   style={{
-                    opacity: 1,
                     border: '0.75px solid rgba(138, 24, 24, 0.95)',
-                    boxShadow: 'inset 0 0 10px rgba(74, 12, 12, 0.9), 0 0 14px rgba(127, 29, 29, 0.95), 0 0 36px rgba(153, 27, 27, 0.95), 0 0 72px rgba(185, 28, 28, 0.85)'
+                    boxShadow: '0 0 14px rgba(127, 29, 29, 0.95), 0 0 36px rgba(153, 27, 27, 0.95), 0 0 72px rgba(185, 28, 28, 0.85)'
                   }}
                 />
                 <span className="text-white/10 text-9xl absolute -bottom-8 -right-8 rotate-12 group-hover:rotate-0 transition-transform duration-700 drop-shadow-lg pointer-events-none">🦴</span>
@@ -1680,8 +1700,17 @@ export default function Home() {
             >
               <ContactTapHint hidden={isTicketCut} label={t.tap} onTap={handleCutTicket} />
 
-              <div className="absolute inset-0 rounded-[4rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
-
+              <div
+                className={`absolute inset-0 rounded-[4rem] ${
+                  isTicketCut
+                    ? ''
+                    : 'shadow-[0_0_18px_rgba(244,114,182,0.12)] group-hover:shadow-[0_0_24px_rgba(244,114,182,0.22)]'
+                }`}
+              >
+              <div
+                className="absolute inset-0 rounded-[4rem]"
+                style={isTicketCut ? undefined : { clipPath: 'inset(0 round 4rem)' }}
+              >
               <motion.div 
                 className="absolute inset-0 bg-[#2a2526] border-2 border-red-300/40 rounded-[4rem] pointer-events-none overflow-hidden"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(50% - 20px), calc(100% - 20px) 50%, 20px 50%, 0 calc(50% - 20px))' }}
@@ -1745,6 +1774,8 @@ export default function Home() {
                   </motion.a>
                 </div>
               </motion.div>
+              </div>
+              </div>
             </motion.div>
           </motion.section>
 
@@ -1762,8 +1793,17 @@ export default function Home() {
               animate={isTicketCut ? { scale: 1.05 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
             >
-              <div className="absolute inset-0 rounded-[2.5rem] shadow-2xl drop-shadow-[0_0_15px_rgba(244,114,182,0.1)] group-hover:drop-shadow-[0_0_20px_rgba(244,114,182,0.2)] transition-all duration-300 pointer-events-none"></div>
-
+              <div
+                className={`absolute inset-0 rounded-[2.5rem] ${
+                  isTicketCut
+                    ? ''
+                    : 'shadow-[0_0_18px_rgba(244,114,182,0.12)] group-hover:shadow-[0_0_24px_rgba(244,114,182,0.22)]'
+                }`}
+              >
+              <div
+                className="absolute inset-0 rounded-[2.5rem]"
+                style={isTicketCut ? undefined : { clipPath: 'inset(0 round 2.5rem)' }}
+              >
               <motion.div 
                 className="absolute inset-0 bg-[#2a2526] border-2 border-red-300/40 rounded-[2.5rem] pointer-events-none overflow-hidden"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% calc(50% - 10px), calc(100% - 10px) 50%, 10px 50%, 0 calc(50% - 10px))' }}
@@ -1829,6 +1869,8 @@ export default function Home() {
                   </motion.a>
                 </div>
               </motion.div>
+              </div>
+              </div>
             </motion.div>
           </motion.section>
 
