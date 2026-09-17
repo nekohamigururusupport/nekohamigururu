@@ -62,7 +62,7 @@ export const LUCKY_GIFTS: Record<Lang, string[]> = {
     'ガトーショコラ',
     'ぬいぐるみ',
     '新しいゲーム機',
-    '塩キャラメル',
+    'おいしいごはん',
     'チョコチップあいす',
   ],
   en: [
@@ -71,7 +71,7 @@ export const LUCKY_GIFTS: Record<Lang, string[]> = {
     'Gâteau au chocolat',
     'A plushie',
     'A new game console',
-    'Salted caramel',
+    'A tasty meal',
     'Chocolate chip ice cream',
   ],
   ko: [
@@ -80,7 +80,7 @@ export const LUCKY_GIFTS: Record<Lang, string[]> = {
     '가토 쇼콜라',
     '인형',
     '새 게임기',
-    '솔티드 캐러멜',
+    '맛있는 밥',
     '초코칩 아이스크림',
   ],
 };
@@ -137,18 +137,9 @@ export const todayKey = () => {
   return `${y}-${m}-${d}`;
 };
 
-const hashString = (value: string) => {
-  let h = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    h ^= value.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-};
-
-const pickWeightedRank = (seed: number): LuckyRankId => {
+const pickWeightedRank = (): LuckyRankId => {
   const total = LUCKY_RANKS.reduce((sum, rank) => sum + rank.weight, 0);
-  let cursor = seed % total;
+  let cursor = Math.floor(Math.random() * total);
   for (const rank of LUCKY_RANKS) {
     if (cursor < rank.weight) return rank.id;
     cursor -= rank.weight;
@@ -156,23 +147,16 @@ const pickWeightedRank = (seed: number): LuckyRankId => {
   return 'kichi';
 };
 
-export const drawLuckyGururu = (dateKey = todayKey()): LuckyDraw => {
-  const seed = hashString(`gururu-lucky-${dateKey}`);
-  const rankId = pickWeightedRank(seed);
-  const rankIndex = LUCKY_RANKS.findIndex((rank) => rank.id === rankId);
-  const compatMax = LUCKY_COMPAT.ja.length - 1;
-  const jitter = (seed % 3) - 1;
-  const compatIndex = Math.min(compatMax, Math.max(0, compatMax - rankIndex + jitter));
+const pickIndex = (length: number) => Math.floor(Math.random() * length);
 
-  return {
-    dateKey,
-    rankId,
-    compatIndex,
-    giftIndex: seed % LUCKY_GIFTS.ja.length,
-    factIndex: (seed >>> 8) % LUCKY_FACTS.ja.length,
-    played: false,
-  };
-};
+export const drawLuckyGururu = (dateKey = todayKey()): LuckyDraw => ({
+  dateKey,
+  rankId: pickWeightedRank(),
+  compatIndex: pickIndex(LUCKY_COMPAT.ja.length),
+  giftIndex: pickIndex(LUCKY_GIFTS.ja.length),
+  factIndex: pickIndex(LUCKY_FACTS.ja.length),
+  played: false,
+});
 
 const readStored = (): LuckyDraw | null => {
   try {

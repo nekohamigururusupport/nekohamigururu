@@ -1921,6 +1921,19 @@ export default function Home() {
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
                 {t.siteCredit} <span className="tracking-normal">🐈‍⬛⛓️</span>: <span className="text-white/80">"{t.siteCreditName}"</span>
               </p>
+              <p className="text-[11px] text-[#a89c9e] tracking-widest font-bold">
+                {t.seCredit}:{' '}
+                <a
+                  href="https://soundeffect-lab.info/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-[#ffdce3] underline-offset-2 hover:underline"
+                  onMouseEnter={() => setIsHoveringLink(true)}
+                  onMouseLeave={() => setIsHoveringLink(false)}
+                >
+                  {t.seCreditName}
+                </a>
+              </p>
             </div>
 
             <p className="text-[11px] text-[#E7E4DC] mb-2 tracking-[0.3em] font-medium">© 2026 猫喰ぐるる / Nekohami Gururu</p>

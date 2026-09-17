@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaPaw, FaXTwitter } from 'react-icons/fa6';
 import type { Copy, Lang } from '@/lib/i18n';
+import { playOmikujiShake, playOmikujiPop, playOmikujiLine, stopOmikujiShake, OMIKUJI_SHAKE_MS } from '@/lib/se';
 import {
   LUCKY_COMPAT,
   LUCKY_DM_URL,
@@ -54,6 +55,7 @@ export const LuckyGururu = ({
   const [showRank, setShowRank] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [fabHover, setFabHover] = useState(false);
+  const lineSeRef = useRef(new Set<string>());
 
   const open = phase !== 'closed';
   const copy = draw ? LUCKY_RANK_COPY[lang][draw.rankId] : null;
@@ -84,13 +86,21 @@ export const LuckyGururu = ({
   }, [phase, reduced]);
 
   useEffect(() => {
-    if (phase !== 'shake') return undefined;
-    const next = window.setTimeout(() => setPhase('draw'), reduced ? 80 : 1650);
-    return () => window.clearTimeout(next);
+    if (phase !== 'shake') {
+      stopOmikujiShake();
+      return undefined;
+    }
+    if (!reduced) playOmikujiShake();
+    const next = window.setTimeout(() => setPhase('draw'), reduced ? 80 : OMIKUJI_SHAKE_MS);
+    return () => {
+      window.clearTimeout(next);
+      stopOmikujiShake();
+    };
   }, [phase, reduced]);
 
   useEffect(() => {
     if (phase !== 'draw') return undefined;
+    if (!reduced) playOmikujiPop();
     const next = window.setTimeout(() => setPhase('reveal'), reduced ? 80 : 820);
     return () => window.clearTimeout(next);
   }, [phase, reduced]);
@@ -98,6 +108,7 @@ export const LuckyGururu = ({
   useEffect(() => {
     if (phase !== 'reveal') {
       setShowRank(false);
+      lineSeRef.current.clear();
       return undefined;
     }
     const next = window.setTimeout(() => setShowRank(true), reduced ? 200 : 2100);
@@ -110,6 +121,35 @@ export const LuckyGururu = ({
     const next = markDrawPlayed(draw);
     setDraw(next);
   }, [phase]);
+
+  const pingLine = (key: string) => {
+    if (lineSeRef.current.has(key)) return;
+    lineSeRef.current.add(key);
+    playOmikujiLine();
+  };
+
+  useEffect(() => {
+    if (phase !== 'reveal') return undefined;
+    const rows: [number, string][] = reduced
+      ? [
+          [200, 'mood'],
+          [250, 'compat'],
+          [300, 'gift'],
+          [350, 'fact'],
+          [400, 'share'],
+          [450, 'tags'],
+        ]
+      : [
+          [2100, 'mood'],
+          [2550, 'compat'],
+          [2850, 'gift'],
+          [3150, 'fact'],
+          [3500, 'share'],
+          [3800, 'tags'],
+        ];
+    const ids = rows.map(([ms, key]) => window.setTimeout(() => pingLine(key), ms));
+    return () => ids.forEach((id) => window.clearTimeout(id));
+  }, [phase, reduced]);
 
   const start = () => {
     const today = loadTodayDraw();
@@ -409,8 +449,14 @@ export const LuckyGururu = ({
                       >
                         <FaXTwitter /> {t.luckyShare}
                       </a>
+                    </motion.div>
 
-                      <div className="pt-2">
+                    <motion.div
+                      className="pt-5"
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: reduced ? 0.25 : 3.8 }}
+                    >
                         <p className="text-center text-sm font-black text-[#7a3038]">{t.luckyTagLead}</p>
                         <p className="text-center text-[11px] text-[#7a3038]/70 mt-1 mb-3">{t.luckyTagBody}</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -432,7 +478,6 @@ export const LuckyGururu = ({
                             </a>
                           ))}
                         </div>
-                      </div>
                     </motion.div>
                   </div>
                 </div>

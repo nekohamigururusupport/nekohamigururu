@@ -36,3 +36,56 @@ export function playTagSe(volume = 0.5) {
 export function playTicketSe(volume = 0.9) {
   playRandom(TICKET_SE, lastTicket, volume);
 }
+
+export const OMIKUJI_SHAKE_MS = 1650;
+
+let shakeAudio: HTMLAudioElement | null = null;
+let shakeCtx: AudioContext | null = null;
+let shakeGain: GainNode | null = null;
+let shakeSource: MediaElementAudioSourceNode | null = null;
+
+export function playOmikujiShake(gain = 1.2) {
+  stopOmikujiShake();
+  if (typeof window === 'undefined') return;
+  const audio = new Audio('/se/omikuji-shake.mp3');
+  shakeAudio = audio;
+  audio.volume = 1;
+  if (!shakeCtx || !shakeGain) {
+    shakeCtx = new AudioContext();
+    shakeGain = shakeCtx.createGain();
+    shakeGain.connect(shakeCtx.destination);
+  }
+  shakeGain.gain.value = gain;
+  shakeSource = shakeCtx.createMediaElementSource(audio);
+  shakeSource.connect(shakeGain);
+  const fit = () => {
+    if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+    audio.playbackRate = Math.min(4, Math.max(1, audio.duration / (OMIKUJI_SHAKE_MS / 1000)));
+  };
+  audio.addEventListener('loadedmetadata', fit);
+  void shakeCtx.resume();
+  void audio.play().then(fit).catch(() => {});
+}
+
+export function stopOmikujiShake() {
+  shakeSource?.disconnect();
+  shakeSource = null;
+  if (!shakeAudio) return;
+  shakeAudio.pause();
+  shakeAudio.currentTime = 0;
+  shakeAudio = null;
+}
+
+export function playOmikujiPop(volume = 0.8) {
+  if (typeof window === 'undefined') return;
+  const audio = new Audio('/se/omikuji-pop.mp3');
+  audio.volume = volume;
+  void audio.play().catch(() => {});
+}
+
+export function playOmikujiLine(volume = 0.75) {
+  if (typeof window === 'undefined') return;
+  const audio = new Audio('/se/omikuji-line.mp3');
+  audio.volume = volume;
+  void audio.play().catch(() => {});
+}
