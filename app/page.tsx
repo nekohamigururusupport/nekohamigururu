@@ -5,8 +5,9 @@ import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, type 
 import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
 import { isSiteReleased } from '@/lib/site-release';
-import { translations, LANG_OPTIONS, type Lang } from '@/lib/i18n';
-import { LuckyGururu } from '@/components/LuckyGururu';
+import { translations, type Lang } from '@/lib/i18n';
+import { LuckyGururu, type LuckyGururuHandle } from '@/components/LuckyGururu';
+import { SiteMenu } from '@/components/SiteMenu';
 import { playTagSe, playTicketSe, TAG_SE_LOCK_MS, TICKET_NAV_MS, TICKET_RESET_MS } from '@/lib/se';
 
 const preReleaseTitleParts = [
@@ -446,19 +447,6 @@ const SiteName = () => (
   </>
 );
 
-const menuPawParticles = [
-  { left: '18%', rotateFrom: 45, rotateTo: 180 },
-  { left: '32%', rotateFrom: 120, rotateTo: 320 },
-  { left: '48%', rotateFrom: 200, rotateTo: 90 },
-  { left: '62%', rotateFrom: 15, rotateTo: 270 },
-  { left: '78%', rotateFrom: 310, rotateTo: 140 },
-  { left: '25%', rotateFrom: 80, rotateTo: 400 },
-  { left: '55%', rotateFrom: 160, rotateTo: 20 },
-  { left: '70%', rotateFrom: 240, rotateTo: 500 },
-  { left: '40%', rotateFrom: 30, rotateTo: 220 },
-  { left: '85%', rotateFrom: 190, rotateTo: 360 },
-];
-
 const mashmallowPawTrail = (() => {
   const start = { x: 10, y: 80 };
   const end = { x: 84, y: 14 };
@@ -484,82 +472,6 @@ const mashmallowPawTrail = (() => {
     });
   }).flat();
 })();
-
-const LanguageSwitcher = ({
-  lang,
-  onChange,
-}: {
-  lang: Lang;
-  onChange: (next: Lang) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const current = LANG_OPTIONS.find((l) => l.id === lang)!;
-
-  useEffect(() => {
-    const onDown = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    window.addEventListener('mousedown', onDown);
-    return () => window.removeEventListener('mousedown', onDown);
-  }, []);
-
-  return (
-    <div ref={wrapRef} className="relative z-[70] shrink-0">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full border-2 border-red-400/50 bg-[#3a3335] text-[#E7E4DC] text-[10px] sm:text-xs md:text-sm font-black tracking-wider hover:border-red-300 hover:text-red-300 transition-all shadow-[0_0_12px_rgba(248,113,113,0.25)]"
-        aria-expanded={open}
-        aria-haspopup="listbox"
-      >
-        <span>{current.label}</span>
-        <svg
-          className={`w-3 h-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.16 }}
-            className="absolute right-0 top-[calc(100%+10px)] min-w-[11rem] rounded-2xl border-2 border-red-400/40 bg-[#2a2526]/95 backdrop-blur-md shadow-[0_12px_30px_rgba(0,0,0,0.45)] overflow-hidden"
-            role="listbox"
-          >
-            {LANG_OPTIONS.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                role="option"
-                aria-selected={opt.id === lang}
-                onClick={() => {
-                  onChange(opt.id);
-                  setOpen(false);
-                }}
-                className={`w-full px-4 py-3 text-sm font-bold tracking-wide transition-colors flex items-center gap-2 ${
-                  opt.id === lang
-                    ? 'bg-red-400/20 text-red-300'
-                    : 'text-[#E7E4DC] hover:bg-white/10 hover:text-red-200'
-                }`}
-              >
-                <span className="text-[10px] opacity-60">{opt.short}</span>
-                <span>{opt.label}</span>
-                {opt.id === lang && <FaPaw className="text-xs" />}
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
 
 const ContactTapHint = ({
   hidden,
@@ -675,6 +587,7 @@ const LiveStreamThumbnail = ({ primarySrc }: { primarySrc: string }) => {
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const luckyRef = useRef<LuckyGururuHandle>(null);
   const [lang, setLang] = useState<Lang>('ja');
   const t = translations[lang];
   const fmtDate = (d: string) => (d.includes('未定') ? t.undecided : d);
@@ -1070,45 +983,32 @@ export default function Home() {
 
         <div className="w-full min-h-screen relative z-10">
           
-          <header className="fixed top-0 w-full h-16 bg-[#453e40]/90 backdrop-blur-sm border-b border-white/10 z-[60] flex items-center justify-between px-4 sm:px-6 md:px-10 xl:px-16 shadow-sm overflow-visible">
-            <div className="flex items-center gap-2">
-              <span className="tracking-normal leading-none text-3xl sm:text-4xl">🐈‍⬛</span>
-              <div className="font-black text-xl sm:text-2xl md:text-3xl leading-none tracking-[0.08em] cursor-default">
-                <SiteName />
-              </div>
-              <span className="tracking-normal leading-none text-3xl sm:text-4xl">⛓️</span>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-3 md:gap-4 xl:gap-6">
-            <nav className="hidden xl:flex gap-5 2xl:gap-10 text-[17px] 2xl:text-[20px] tracking-wide text-[#E7E4DC] font-bold">
-              {navItems.map((item) => (
-                <motion.a 
-                  key={item.key} 
-                  href={item.href}
-                  className="hover:text-red-300 transition-all whitespace-nowrap"
-                  onHoverStart={() => setIsHoveringLink(true)}
-                  onHoverEnd={() => setIsHoveringLink(false)}
-                >{t.nav[item.key]}</motion.a>
-              ))}
-            </nav>
-            <LanguageSwitcher lang={lang} onChange={setLang} />
-            <button 
-              className="xl:hidden text-[#E7E4DC] p-2 focus:outline-none"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-            </div>
-          </header>
+          <SiteMenu
+            open={isMenuOpen}
+            onOpen={() => setIsMenuOpen(true)}
+            onClose={() => setIsMenuOpen(false)}
+            items={navItems.map((item) => ({
+              key: item.key,
+              href: item.href,
+              mobileHref: item.mobileHref,
+              label: t.nav[item.key],
+            }))}
+            lang={lang}
+            onLang={setLang}
+            luckyLabel={t.luckyFab}
+            onLucky={() => {
+              setIsMenuOpen(false);
+              luckyRef.current?.start();
+            }}
+            menuLabel={t.menu}
+            closeLabel={t.menuClose}
+            onHoverLink={setIsHoveringLink}
+          />
 
           {!showSplash && (
             <LuckyGururu
+              ref={luckyRef}
+              hideFab
               lang={lang}
               t={t}
               onTagNavigate={handleTagNavigate}
@@ -1116,52 +1016,7 @@ export default function Home() {
             />
           )}
 
-          <AnimatePresence>
-            {isMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="fixed top-16 left-0 w-full bg-[#3a3335]/95 backdrop-blur-md border-b border-white/10 flex flex-col items-center py-4 md:py-6 gap-3 md:gap-4 xl:hidden z-[55] shadow-xl overflow-hidden"
-              >
-                <div className="absolute inset-0 z-0 pointer-events-none">
-                  {menuPawParticles.map((p, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute w-5 h-5 text-[#ffdce3] opacity-60 drop-shadow-[0_0_8px_rgba(255,220,227,0.4)]"
-                      style={{ left: p.left, top: '-10%' }}
-                      animate={{
-                        y: ['0vh', '100vh'],
-                        opacity: [0, 0.6, 0.6, 0],
-                        rotate: [p.rotateFrom, p.rotateTo],
-                      }}
-                      transition={{ 
-                        delay: i * 0.3, 
-                        duration: 3, 
-                        repeat: Infinity, 
-                        ease: "linear" 
-                      }}
-                    >
-                      <FaPaw className="text-sm rotate-12" />
-                    </motion.div>
-                  ))}
-                </div>
-
-                {navItems.map((item) => (
-                  <a 
-                    key={item.key} 
-                    href={item.mobileHref ?? item.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-[#E7E4DC] font-bold text-sm md:text-base lg:text-lg tracking-[0.2em] hover:text-red-300 transition-colors relative z-10"
-                  >
-                    {t.nav[item.key]}
-                  </a>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <section id="top" className="min-h-[80vh] md:min-h-0 xl:min-h-screen flex flex-col md:flex-row items-center justify-start xl:justify-center px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 pt-24 sm:pt-28 md:pt-28 lg:pt-24 xl:pt-16 pb-16 md:pb-20 xl:pb-0 mb-24 sm:mb-32 lg:mb-48 relative scroll-mt-24 gap-8 sm:gap-12 md:gap-10 lg:gap-12 xl:gap-0">
+          <section id="top" className="min-h-[80vh] md:min-h-0 xl:min-h-screen flex flex-col md:flex-row items-center justify-start xl:justify-center px-4 sm:px-6 md:px-12 lg:px-16 xl:px-24 pt-16 sm:pt-20 md:pt-16 lg:pt-16 xl:pt-12 pb-16 md:pb-20 xl:pb-0 mb-24 sm:mb-32 lg:mb-48 relative scroll-mt-8 gap-8 sm:gap-12 md:gap-10 lg:gap-12 xl:gap-0">
             <div className="flex-none md:flex-1 text-center md:text-left z-10 lg:pl-6 xl:pl-10 flex flex-col items-center md:items-start">
               <div className="inline-block px-3 py-1 rounded-full border border-red-300/40 text-red-300/90 text-[12px] sm:text-[13px] md:text-[16px] lg:text-[18px] xl:text-[20px] tracking-widest mb-4 md:mb-6 bg-red-900/10">
                 {t.fvBadge}

@@ -48,6 +48,8 @@ export const translations = {
     contactBodyBefore: 'お仕事やコラボのご相談は',
     contactBodyAfter: 'にて承ってます',
     tap: 'タップ',
+    menu: 'MENU',
+    menuClose: 'CLOSE',
     guidelineTitle: '二次創作・ガイドラインについて',
     guidelineItems: [
       {
@@ -126,6 +128,8 @@ export const translations = {
     contactBodyBefore: 'Work and collab inquiries accepted via ',
     contactBodyAfter: '',
     tap: 'TAP',
+    menu: 'MENU',
+    menuClose: 'CLOSE',
     guidelineTitle: 'About Fanworks & Guidelines',
     guidelineItems: [
       {
@@ -204,6 +208,8 @@ export const translations = {
     contactBodyBefore: '업무·콜라보 문의는 ',
     contactBodyAfter: '으로 받아요',
     tap: '탭',
+    menu: 'MENU',
+    menuClose: 'CLOSE',
     guidelineTitle: '2차 창작·가이드라인에 대해',
     guidelineItems: [
       {

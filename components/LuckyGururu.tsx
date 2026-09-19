@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef, type MouseEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaPaw, FaXTwitter } from 'react-icons/fa6';
 import type { Copy, Lang } from '@/lib/i18n';
@@ -39,17 +39,21 @@ const sparks = [
   { x: -12, y: 46, r: 22, d: 0.1 },
 ];
 
-export const LuckyGururu = ({
-  lang,
-  t,
-  onTagNavigate,
-  onHoverLink,
-}: {
+export type LuckyGururuHandle = { start: () => void };
+
+export const LuckyGururu = forwardRef<LuckyGururuHandle, {
   lang: Lang;
   t: Copy;
   onTagNavigate: (e: MouseEvent<HTMLAnchorElement>, tag: string) => void;
   onHoverLink: (hovering: boolean) => void;
-}) => {
+  hideFab?: boolean;
+}>(({
+  lang,
+  t,
+  onTagNavigate,
+  onHoverLink,
+  hideFab = false,
+}, ref) => {
   const [phase, setPhase] = useState<Phase>('closed');
   const [draw, setDraw] = useState<LuckyDraw | null>(null);
   const [showRank, setShowRank] = useState(false);
@@ -159,6 +163,8 @@ export const LuckyGururu = ({
     setPhase(reduced ? 'reveal' : 'shake');
   };
 
+  useImperativeHandle(ref, () => ({ start }), [reduced]);
+
   const close = () => {
     setPhase('closed');
     setShowRank(false);
@@ -166,6 +172,7 @@ export const LuckyGururu = ({
 
   return (
     <>
+      {!hideFab && (
       <div
         className={`fixed top-[4.6rem] right-3 sm:right-4 md:right-6 z-[58] ${open ? 'opacity-0 pointer-events-none' : ''}`}
         onMouseEnter={() => {
@@ -214,6 +221,7 @@ export const LuckyGururu = ({
           </motion.button>
         </div>
       </div>
+      )}
 
       <AnimatePresence>
         {open && draw && copy && (
@@ -488,4 +496,6 @@ export const LuckyGururu = ({
       </AnimatePresence>
     </>
   );
-};
+});
+
+LuckyGururu.displayName = 'LuckyGururu';
