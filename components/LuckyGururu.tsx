@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useImperativeHandle, forwardRef, type MouseEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useImperativeHandle, forwardRef, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FaPaw, FaXTwitter } from 'react-icons/fa6';
 import type { Copy, Lang } from '@/lib/i18n';
@@ -9,6 +10,7 @@ import {
   LUCKY_COMPAT,
   LUCKY_DM_URL,
   LUCKY_FACTS,
+  LUCKY_FACT_ASK_INDEXES,
   LUCKY_GIFTS,
   LUCKY_MASH_URL,
   LUCKY_RANK_COPY,
@@ -60,9 +62,13 @@ export const LuckyGururu = forwardRef<LuckyGururuHandle, {
   const [reduced, setReduced] = useState(false);
   const [fabHover, setFabHover] = useState(false);
   const lineSeRef = useRef(new Set<string>());
+  const factBoxRef = useRef<HTMLDivElement>(null);
+  const [askPos, setAskPos] = useState<{ top: number; left: number } | null>(null);
+  const [showAskBubble, setShowAskBubble] = useState(false);
 
   const open = phase !== 'closed';
   const copy = draw ? LUCKY_RANK_COPY[lang][draw.rankId] : null;
+  const showFactAsk = Boolean(draw && LUCKY_FACT_ASK_INDEXES.includes(draw.factIndex));
 
   useEffect(() => {
     setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -125,6 +131,40 @@ export const LuckyGururu = forwardRef<LuckyGururuHandle, {
     const next = markDrawPlayed(draw);
     setDraw(next);
   }, [phase]);
+
+  useLayoutEffect(() => {
+    if (phase !== 'reveal' || !showFactAsk) {
+      setAskPos(null);
+      return undefined;
+    }
+    const place = () => {
+      const el = factBoxRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setAskPos({ top: r.top + r.height * 0.34, left: r.right - 8 });
+    };
+    place();
+    const id = window.requestAnimationFrame(place);
+    const ro = new ResizeObserver(place);
+    if (factBoxRef.current) ro.observe(factBoxRef.current);
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      window.cancelAnimationFrame(id);
+      ro.disconnect();
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
+  }, [phase, showFactAsk, lang, draw?.factIndex]);
+
+  useEffect(() => {
+    if (phase !== 'reveal' || !showFactAsk) {
+      setShowAskBubble(false);
+      return undefined;
+    }
+    const next = window.setTimeout(() => setShowAskBubble(true), reduced ? 520 : 4200);
+    return () => window.clearTimeout(next);
+  }, [phase, showFactAsk, reduced]);
 
   const pingLine = (key: string) => {
     if (lineSeRef.current.has(key)) return;
@@ -315,10 +355,6 @@ export const LuckyGururu = forwardRef<LuckyGururuHandle, {
                     src="/lucky/seal.png"
                     alt=""
                     className="pointer-events-none absolute top-2 right-3 w-16 sm:w-20 drop-shadow-md"
-                    style={{
-                      WebkitMaskImage: 'radial-gradient(circle, #000 64%, transparent 70%)',
-                      maskImage: 'radial-gradient(circle, #000 64%, transparent 70%)',
-                    }}
                     initial={{ scale: 1.8, rotate: -25, opacity: 0 }}
                     animate={{ scale: 1, rotate: 12, opacity: 1 }}
                     transition={{ delay: 0.18, type: 'spring', stiffness: 380, damping: 12 }}
@@ -403,6 +439,7 @@ export const LuckyGururu = forwardRef<LuckyGururuHandle, {
                       ].map((row) => (
                         <motion.div
                           key={row.label}
+                          ref={row.label === t.luckyFact ? factBoxRef : undefined}
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: reduced ? 0.15 : row.delay }}
@@ -494,6 +531,20 @@ export const LuckyGururu = forwardRef<LuckyGururuHandle, {
           </motion.div>
         )}
       </AnimatePresence>
+      {phase === 'reveal' && showFactAsk && showAskBubble && askPos &&
+        createPortal(
+          <motion.span
+            initial={{ opacity: 0, scale: 0.25, y: 14, rotate: -22 }}
+            animate={{ opacity: 1, scale: 1, y: 0, rotate: -8 }}
+            transition={{ type: 'spring', stiffness: 560, damping: 13 }}
+            className="pointer-events-none fixed z-[90] w-max max-w-[9.5rem] -translate-y-1/2 rounded-2xl border-[2.5px] border-[#c45c6a] bg-white px-2.5 py-2 text-center text-[11px] sm:text-sm font-black leading-snug text-[#9b182c] shadow-[0_8px_18px_rgba(122,48,56,0.32)]"
+            style={{ top: askPos.top, left: askPos.left }}
+          >
+            <span className="absolute top-1/2 -left-1.5 h-3 w-3 -translate-y-1/2 rotate-45 border-b-[2.5px] border-l-[2.5px] border-[#c45c6a] bg-white" />
+            {t.luckyFactAsk}
+          </motion.span>,
+          document.body,
+        )}
     </>
   );
 });

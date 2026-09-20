@@ -85,6 +85,9 @@ export const LUCKY_GIFTS: Record<Lang, string[]> = {
   ],
 };
 
+/** ぐるるプチ情報 2・3（0始まりで 1, 2）は吹き出しを出す。 */
+export const LUCKY_FACT_ASK_INDEXES = [1, 2];
+
 /** ぐるるプチ情報のプール。後から追加する。 */
 export const LUCKY_FACTS: Record<Lang, string[]> = {
   ja: [
