@@ -770,7 +770,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: globalThis.MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
     };
