@@ -543,6 +543,7 @@ const ContactTapHint = ({
 };
 
 const TWITTER_DM_URL = 'https://twitter.com/messages/compose?recipient_id=2005495955274219520';
+const TWITCASTING_SCREEN_ID = 'h_neko20';
 
 const LiveStreamThumbnail = ({ primarySrc }: { primarySrc: string }) => {
   const [src, setSrc] = useState(primarySrc);
