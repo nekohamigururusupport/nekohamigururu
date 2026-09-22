@@ -1579,20 +1579,20 @@ export default function Home() {
           </motion.section>
 
           <section className="px-4 sm:px-6 md:px-12 lg:px-24 mb-8 lg:mb-10 max-w-6xl mx-auto text-center border-t border-white/10 pt-10 lg:pt-12 relative z-10 scroll-mt-24">
-            <h2 className="text-lg lg:text-xl font-bold text-[#E7E4DC] mb-8 tracking-widest">{t.guidelineTitle}</h2>
+            <h2 className="text-base lg:text-xl font-bold text-[#E7E4DC] mb-8 tracking-widest">{t.guidelineTitle}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 md:gap-x-12 gap-y-6 md:gap-y-8 text-left">
               {t.guidelineItems.flatMap((item, i) => [
-                <p key={`gl-${i}`} className="text-sm text-[#a89c9e] leading-relaxed font-medium whitespace-pre-line">
+                <p key={`gl-${i}`} className="text-xs md:text-sm text-[#a89c9e] leading-relaxed font-medium whitespace-pre-line">
                   {item.left}
                 </p>,
-                <p key={`gr-${i}`} className="text-sm text-[#a89c9e] leading-relaxed font-medium whitespace-pre-line">
+                <p key={`gr-${i}`} className="text-xs md:text-sm text-[#a89c9e] leading-relaxed font-medium whitespace-pre-line">
                   {item.right}
                 </p>,
               ])}
             </div>
             <div className="mt-10 flex flex-col items-center gap-4">
               <div className="w-12 h-[1px] bg-red-400/40"></div>
-              <p className="text-base lg:text-lg text-[#a89c9e] leading-relaxed max-w-3xl font-medium whitespace-pre-line">
+              <p className="text-sm lg:text-lg text-[#a89c9e] leading-relaxed max-w-3xl font-medium whitespace-pre-line">
                 {t.guidelineWelcome}
               </p>
               <div className="w-12 h-[1px] bg-red-400/40"></div>
