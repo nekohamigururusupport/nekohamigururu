@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { M_PLUS_Rounded_1c, Yomogi } from "next/font/google";
 import { isSiteReleased, PRE_RELEASE_SITE_TITLE } from "@/lib/site-release";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const roundedFont = M_PLUS_Rounded_1c({
@@ -97,7 +98,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" className={`scroll-smooth ${yomogi.variable}`}>
-      <body className={roundedFont.className}>{children}</body>
+      <body className={roundedFont.className}>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
