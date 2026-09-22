@@ -148,8 +148,8 @@ export const SiteMenu = ({
                 className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.78] scale-x-[-1]"
               />
 
-              <div className="relative h-full overflow-y-auto pt-24 pb-10 px-8 sm:px-12">
-              <nav className="relative grid grid-cols-2 gap-x-6 sm:gap-x-10 gap-y-7 sm:gap-y-9">
+              <div className="relative h-full overflow-y-auto pt-24 pb-10 px-5 sm:px-12">
+              <nav className="relative grid grid-cols-2 gap-x-3 sm:gap-x-10 gap-y-7 sm:gap-y-9">
                 {items.map((item) => (
                   <button
                     key={item.key}
@@ -157,11 +157,11 @@ export const SiteMenu = ({
                     onClick={() => go(item)}
                     onMouseEnter={() => hover(item.key)}
                     onMouseLeave={() => hover(null)}
-                    className={`text-left text-white text-lg sm:text-xl font-black tracking-[0.14em] drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] inline-flex items-center gap-2.5 transition-[filter,transform] ${
+                    className={`text-left text-white text-lg sm:text-xl font-black tracking-[0.06em] sm:tracking-[0.12em] whitespace-nowrap drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)] inline-flex items-center gap-1.5 min-w-0 transition-[filter,transform] ${
                       hovered === item.key ? 'scale-[1.05] drop-shadow-[0_0_14px_rgba(255,255,255,0.55)]' : ''
                     }`}
                   >
-                    <span className="w-7 sm:w-8 inline-flex justify-center shrink-0">
+                    <span className="w-5 sm:w-8 inline-flex justify-center shrink-0">
                       <HoverPaw show={hovered === item.key} />
                     </span>
                     {item.label}
@@ -173,7 +173,7 @@ export const SiteMenu = ({
                 type="button"
                 onClick={onLucky}
                 onMouseEnter={() => hover(null)}
-                className="group relative mt-10 w-full flex items-center gap-3 rounded-2xl border border-red-300/35 bg-red-400/12 px-4 py-3.5 hover:bg-red-400/20 hover:border-red-300/60 transition-colors"
+                className="group relative mt-24 sm:mt-28 w-full flex items-center gap-3 rounded-2xl border border-red-300/35 bg-red-400/12 px-4 py-3.5 hover:bg-red-400/20 hover:border-red-300/60 transition-colors"
               >
                 <img
                   src="/lucky/tube.png"
