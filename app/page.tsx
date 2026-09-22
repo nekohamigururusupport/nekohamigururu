@@ -8,7 +8,9 @@ import { isSiteReleased } from '@/lib/site-release';
 import { translations, type Lang } from '@/lib/i18n';
 import { LuckyGururu, type LuckyGururuHandle } from '@/components/LuckyGururu';
 import { SiteMenu } from '@/components/SiteMenu';
+import { HeroVisual } from '@/components/HeroVisual';
 import { playTagSe, playTicketSe, TAG_SE_LOCK_MS, TICKET_NAV_MS, TICKET_RESET_MS } from '@/lib/se';
+import { ART_CREDITS } from '@/lib/art-credits';
 
 const preReleaseTitleParts = [
   { text: 'とある', className: 'text-[#f4ebeb]' },
@@ -1024,14 +1026,11 @@ export default function Home() {
               <h1 className="text-[32px] sm:text-[36px] md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-9xl font-black tracking-[0.12em] sm:tracking-[0.16em] md:tracking-[0.2em] xl:tracking-[15px] leading-tight whitespace-nowrap ml-[6px] sm:ml-[10px] md:ml-[16px] xl:ml-[20px]">
                 <SiteName />
               </h1>
-              
+
               <p className="text-[#E7E4DC] text-[9px] sm:text-[10px] md:text-[11px] lg:text-sm xl:text-[21px] tracking-[0.55em] sm:tracking-[0.7em] md:tracking-[0.35em] lg:tracking-[0.4em] xl:tracking-[1em] mt-2 font-bold uppercase whitespace-nowrap lg:ml-[20px] xl:ml-[30px]">
                 NEKOHAMI GURURU
               </p>
 
-              {/* ========================================== */}
-              {/* ▼ PC用サブタイトル（1280px以上） ▼ */}
-              {/* ========================================== */}
               <div className={`hidden xl:inline-flex relative isolate items-center justify-start mt-6 mb-2 font-bold tracking-widest w-fit max-w-full px-4 py-1 ${lang === 'ja' ? 'whitespace-nowrap' : 'flex-wrap'}`}>
                 <span aria-hidden className="pointer-events-none absolute inset-x-[-8px] top-[22%] bottom-[22%] -z-10 rounded-full bg-[#fff4f6]/20 blur-lg" />
                 <AccentText className={`text-[28px] 2xl:text-[40px] ${lang === 'ja' ? '' : 'whitespace-normal'}`}>{t.fvSubLead}</AccentText>
@@ -1042,9 +1041,6 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* ========================================== */}
-              {/* ▼ モバイル・タブレット用サブタイトル ▼ */}
-              {/* ========================================== */}
               <div className="inline-flex xl:hidden relative isolate flex-col items-center md:items-start justify-center mt-6 mb-2 font-bold tracking-widest w-fit max-w-full px-3 py-1">
                 <span aria-hidden className="pointer-events-none absolute inset-x-[-8px] top-[22%] bottom-[22%] -z-10 rounded-full bg-[#fff4f6]/20 blur-lg" />
                 <AccentText className={`text-[15px] sm:text-[18px] md:text-[22px] lg:text-[26px] ${lang === 'ja' ? 'whitespace-nowrap' : 'whitespace-normal text-center md:text-left'}`}>{t.fvSubLead}</AccentText>
@@ -1054,10 +1050,9 @@ export default function Home() {
                   <span className="text-[15px] sm:text-[16px] md:text-[20px] lg:text-[24px] opacity-90 tracking-normal">⛓️</span>
                 </span>
               </div>
-              
             </div>
 
-            <div 
+            <div
               ref={tiltRef}
               className="flex-none md:flex-1 w-full flex items-center justify-center relative z-10"
               style={{ perspective: 1000 }}
@@ -1075,25 +1070,12 @@ export default function Home() {
                 tiltY.set(0);
               }}
             >
-              <motion.div 
-                className="relative h-56 sm:h-64 md:h-[360px] lg:h-[460px] xl:h-[550px] aspect-square bg-[#544b4d] border border-white/10 rounded-[3rem] md:rounded-[4rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center justify-center overflow-hidden group will-change-transform"
+              <motion.div
+                className="relative w-full flex items-center justify-center will-change-transform"
                 style={{ rotateX: tiltRotateX, rotateY: tiltRotateY }}
               >
-                <div
-                  className="absolute inset-0 z-30 rounded-[3rem] md:rounded-[4rem] pointer-events-none"
-                  style={{
-                    border: '0.75px solid rgba(138, 24, 24, 0.95)',
-                    boxShadow: '0 0 14px rgba(127, 29, 29, 0.95), 0 0 36px rgba(153, 27, 27, 0.95), 0 0 72px rgba(185, 28, 28, 0.85)'
-                  }}
-                />
-                <span className="text-white/10 text-9xl absolute -bottom-8 -right-8 rotate-12 group-hover:rotate-0 transition-transform duration-700 drop-shadow-lg pointer-events-none">🦴</span>
-                <img
-                  src="/img/fv1.jpg"
-                  alt="猫喰ぐるる"
-                  className="w-full h-full object-cover object-center"
-                />
+                <HeroVisual />
               </motion.div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-red-400/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
             </div>
           </section>
 
@@ -1776,6 +1758,25 @@ export default function Home() {
               <p className="text-xs text-[#a89c9e] tracking-widest font-bold">
                 {t.siteCredit} <span className="tracking-normal">🐈‍⬛⛓️</span>: <span className="text-white/80">"{t.siteCreditName}"</span>
               </p>
+              {ART_CREDITS.map((credit) => (
+                <p key={credit.id} className="text-[11px] text-[#a89c9e] tracking-widest font-bold">
+                  {t[credit.labelKey]}：
+                  {credit.url ? (
+                    <a
+                      href={credit.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/80 hover:text-[#ffdce3] underline-offset-2 hover:underline"
+                      onMouseEnter={() => setIsHoveringLink(true)}
+                      onMouseLeave={() => setIsHoveringLink(false)}
+                    >
+                      {credit.name}
+                    </a>
+                  ) : (
+                    <span className="text-white/80">{credit.name}</span>
+                  )}
+                </p>
+              ))}
               <p className="text-[11px] text-[#a89c9e] tracking-widest font-bold">
                 {t.seCredit}:{' '}
                 <a
