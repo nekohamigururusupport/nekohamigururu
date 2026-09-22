@@ -38,33 +38,36 @@ export const HeroVisual = () => {
   }, [reduced]);
 
   const slide = SLIDES[index];
+  const standShift = slide.src.includes('hero-stand') ? 'max-md:-translate-x-[8%]' : '';
 
   return (
     <div className="relative w-full max-w-[22rem] sm:max-w-[26rem] md:max-w-[30rem] lg:max-w-[36rem] xl:max-w-[40rem] flex flex-col items-center">
-      <div className="relative w-full h-[20rem] sm:h-[24rem] md:h-[400px] lg:h-[500px] xl:h-[580px]">
-        <AnimatePresence initial={false}>
-          <motion.img
-            key={slide.src}
-            src={slide.src}
-            alt={slide.alt}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduced ? undefined : { opacity: 0 }}
-            transition={{ duration: FADE_S, ease: 'linear' }}
-            className="absolute inset-0 m-auto h-full w-full object-contain drop-shadow-[0_18px_32px_rgba(0,0,0,0.45)]"
-          />
-        </AnimatePresence>
-        {glitch && (
-          <div className="hero-glitch absolute inset-0" aria-hidden>
-            {[1, 2, 3, 4].map((n) => (
-              <span
-                key={n}
-                className={`hero-glitch-item hero-glitch-item--${n}`}
-                style={{ backgroundImage: `url(${slide.src})` }}
-              />
-            ))}
-          </div>
-        )}
+      <div className="relative w-full h-[20rem] sm:h-[24rem] md:h-[400px] lg:h-[500px] xl:h-[580px] overflow-visible">
+        <div className={`absolute inset-0 ${standShift}`}>
+          <AnimatePresence initial={false}>
+            <motion.img
+              key={slide.src}
+              src={slide.src}
+              alt={slide.alt}
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduced ? undefined : { opacity: 0 }}
+              transition={{ duration: FADE_S, ease: 'linear' }}
+              className="absolute inset-0 m-auto h-full w-full object-contain drop-shadow-[0_18px_32px_rgba(0,0,0,0.45)]"
+            />
+          </AnimatePresence>
+          {glitch && (
+            <div className="hero-glitch absolute inset-0" aria-hidden>
+              {[1, 2, 3, 4].map((n) => (
+                <span
+                  key={n}
+                  className={`hero-glitch-item hero-glitch-item--${n}`}
+                  style={{ backgroundImage: `url(${slide.src})` }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <p className="mt-6 md:mt-8 text-sm sm:text-base md:text-lg font-black tracking-[0.22em] text-white">
         {slide.credit}

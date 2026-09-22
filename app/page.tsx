@@ -4,81 +4,12 @@ import { useState, useEffect, useRef, type CSSProperties, type ReactNode, type M
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, type MotionValue } from 'framer-motion';
 import { FaXTwitter, FaYoutube, FaTiktok, FaPaw } from 'react-icons/fa6';
 import { TbBroadcast } from 'react-icons/tb';
-import { isSiteReleased } from '@/lib/site-release';
 import { translations, type Lang } from '@/lib/i18n';
 import { LuckyGururu, type LuckyGururuHandle } from '@/components/LuckyGururu';
 import { SiteMenu } from '@/components/SiteMenu';
 import { HeroVisual } from '@/components/HeroVisual';
 import { playTagSe, playTicketSe, TAG_SE_LOCK_MS, TICKET_NAV_MS, TICKET_RESET_MS } from '@/lib/se';
 import { ART_CREDITS } from '@/lib/art-credits';
-
-const preReleaseTitleParts = [
-  { text: 'とある', className: 'text-[#f4ebeb]' },
-  { text: '新人配信者', className: 'text-[#f4ebeb]' },
-  { text: '🐾', className: 'text-red-400' },
-  { text: '公式サイト', className: 'text-red-400' },
-];
-
-const PreReleaseSiteTitle = ({
-  variant = 'fv',
-  animated = false,
-}: {
-  variant?: 'splash' | 'fv';
-  animated?: boolean;
-}) => {
-  const sizeClass =
-    variant === 'splash'
-      ? 'text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-[0.08em] md:tracking-[0.12em]'
-      : 'text-[1.35rem] sm:text-3xl md:text-5xl lg:text-7xl tracking-[0.06em] sm:tracking-[0.1em] md:tracking-[0.15em]';
-
-  const renderPart = (part: (typeof preReleaseTitleParts)[number], index: number) => {
-    const className = `${part.className} drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]`;
-
-    if (animated) {
-      return (
-        <motion.span
-          key={part.text}
-          className={className}
-          initial={{ opacity: 0, x: -30, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-          transition={{ delay: 0.5 + index * 0.15, duration: 0.6, type: 'spring', stiffness: 100 }}
-        >
-          {part.text}
-        </motion.span>
-      );
-    }
-
-    return (
-      <span key={part.text} className={className}>
-        {part.text}
-      </span>
-    );
-  };
-
-  if (variant === 'splash') {
-    return (
-      <h1
-        className={`font-black leading-tight text-center flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-1 max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
-      >
-        {preReleaseTitleParts.map((part, i) => renderPart(part, i))}
-      </h1>
-    );
-  }
-
-  const leadParts = preReleaseTitleParts.slice(0, 3);
-  const suffixPart = preReleaseTitleParts[3];
-
-  return (
-    <h1
-      className={`font-black leading-tight flex flex-col items-center justify-center w-full max-w-[min(100%,36rem)] px-2 ${sizeClass}`}
-    >
-      <span className="inline-flex items-baseline justify-center gap-x-1 sm:gap-x-2 whitespace-nowrap">
-        {leadParts.map((part, i) => renderPart(part, i))}
-      </span>
-      <span className="block text-center">{renderPart(suffixPart, 3)}</span>
-    </h1>
-  );
-};
 
 // 🐾 オープニング用：ネオンガラス肉球の花火エフェクトパーツ
 const SplashNeonPaw = ({ top, left, rotate, delay, scale }: { top: string, left: string, rotate: string, delay: number, scale: string }) => (
@@ -175,8 +106,7 @@ const SplashComment = ({
   </motion.div>
 );
 
-// 🐾 オープニング画面コンポーネント（公開後のみ名前表示）
-const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showName: boolean }) => {
+const SplashScreen = ({ onComplete }: { onComplete: () => void }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
@@ -209,7 +139,6 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
       ))}
 
       <div className="relative z-10 px-4 flex justify-center w-full">
-        {showName ? (
           <div className="flex gap-1 md:gap-2">
             {chars.map((char, i) => (
             <motion.span
@@ -225,9 +154,6 @@ const SplashScreen = ({ onComplete, showName }: { onComplete: () => void; showNa
             </motion.span>
             ))}
           </div>
-        ) : (
-          <PreReleaseSiteTitle variant="splash" animated />
-        )}
       </div>
     </motion.div>
   );
@@ -867,70 +793,10 @@ export default function Home() {
     };
   }, []);
 
-  // ==========================================
-  // 公開フラグ — デビュー時: NEXT_PUBLIC_SITE_RELEASED=true（本番）
-  // ==========================================
-  const isReleased = isSiteReleased();
-
-  if (!isReleased) {
-    return (
-      <>
-        <AnimatePresence>
-          {showSplash && (
-            <SplashScreen onComplete={() => setShowSplash(false)} showName={false} />
-          )}
-        </AnimatePresence>
-
-        {!showSplash && (
-          <main className="min-h-screen bg-[#453e40] text-[#f4ebeb] font-sans selection:bg-red-500/30 flex flex-col items-center justify-center relative overflow-hidden">
-            <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/pinstriped-dark.png')] z-0"></div>
-            <GlassPawBG className="w-64 h-64 top-[10%] left-[10%] rotate-12" />
-            <GlassPawBG className="w-40 h-40 bottom-[20%] right-[10%] -rotate-45" />
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-              className="relative z-10 flex flex-col items-center gap-8 p-6 text-center"
-            >
-              <FaPaw className="text-red-400/50 text-6xl md:text-8xl mb-2 animate-bounce drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
-
-              <PreReleaseSiteTitle variant="fv" />
-
-              <div className="w-24 h-[2px] bg-red-400/50 rounded-full"></div>
-
-              <p className="text-2xl md:text-4xl text-red-300 font-black tracking-[0.3em] md:tracking-[0.5em] drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]">
-                COMING SOON
-              </p>
-
-              <div className="mt-4 flex flex-col items-center gap-3">
-                <p className="text-[#a89c9e] text-sm md:text-base font-bold tracking-[0.2em] border border-white/10 bg-white/5 px-6 py-2 rounded-full backdrop-blur-sm">
-                  2026 DEBUT🐾
-                </p>
-                <a
-                  href="https://x.com/h_neko20?s=21"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-red-300 hover:text-red-200 text-sm md:text-base font-bold tracking-widest mt-2 flex items-center gap-2 transition-colors underline underline-offset-4 decoration-red-400/80 decoration-2 hover:decoration-red-300 drop-shadow-[0_0_10px_rgba(248,113,113,0.35)]"
-                >
-                  <FaXTwitter className="text-base md:text-lg" />
-                  {t.followX}
-                </a>
-              </div>
-            </motion.div>
-          </main>
-        )}
-      </>
-    );
-  }
-  // ==========================================
-
-
-  // 🚀 👇ここから下はデビュー後に表示される本物のサイトコード👇 🚀
   return (
     <>
       <AnimatePresence>
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} showName={isReleased} />}
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       </AnimatePresence>
 
       <motion.div

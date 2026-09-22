@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { M_PLUS_Rounded_1c, Yomogi } from "next/font/google";
-import { isSiteReleased, PRE_RELEASE_SITE_TITLE } from "@/lib/site-release";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -52,44 +51,12 @@ const releasedMetadata: Metadata = {
   },
 };
 
-const preReleaseMetadata: Metadata = {
-  title: PRE_RELEASE_SITE_TITLE,
-  description: "2026 DEBUT — Official site opening soon.",
-  robots: { index: false, follow: false },
-  openGraph: {
-    title: PRE_RELEASE_SITE_TITLE,
-    description: "2026 DEBUT — Official site opening soon.",
-    url: "https://nekohami-gururu.com",
-    siteName: PRE_RELEASE_SITE_TITLE,
-    images: [
-      {
-        url: "https://nekohami-gururu.com/ogp.png",
-        width: 1200,
-        height: 630,
-        alt: PRE_RELEASE_SITE_TITLE,
-      },
-    ],
-    locale: "ja_JP",
-    type: "website",
-  },
-  icons: {
-    icon: { url: "/favicons/soon.ico" },
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: PRE_RELEASE_SITE_TITLE,
-    description: "2026 DEBUT — Official site opening soon.",
-    creator: "@h_neko20",
-    images: ["https://nekohami-gururu.com/ogp.png"],
-  },
-};
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };
 
-export const metadata: Metadata = isSiteReleased() ? releasedMetadata : preReleaseMetadata;
+export const metadata: Metadata = releasedMetadata;
 
 export default function RootLayout({
   children,
